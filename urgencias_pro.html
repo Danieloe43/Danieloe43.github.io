@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedRef · Urgencias Hospitalarias</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN SYSTEM — Sobrio, clínico, editorial
+   Paleta: blanco roto / gris cálido / azul pizarra / acento índigo
+   ============================================================ */
+:root {
+  --c-bg:       #F7F6F3;
+  --c-surface:  #FFFFFF;
+  --c-border:   #E4E2DC;
+  --c-border2:  #D0CEC7;
+  --c-text:     #1C1C1A;
+  --c-text2:    #5A5850;
+  --c-text3:    #9A9890;
+  --c-accent:   #2C4A8C;
+  --c-accent-l: #EEF2FA;
+  --c-red:      #C0392B;
+  --c-red-l:    #FDECEA;
+  --c-green:    #1A6B3A;
+  --c-green-l:  #EAF4EE;
+  --c-amber:    #8B5E00;
+  --c-amber-l:  #FDF6E3;
+  --c-purple:   #5B3EA6;
+  --c-purple-l: #F2EEFB;
+  --c-teal:     #1A6670;
+  --c-teal-l:   #E8F5F6;
+  --c-slate:    #3D5068;
+  --c-slate-l:  #EDF1F5;
+  --ecg-line:   #1A6B3A;
+  --ecg-grid:   rgba(0,100,50,0.08);
+  --ecg-grid2:  rgba(0,100,50,0.04);
+  --r: 4px;
+  --r-lg: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--c-bg);
+  color:var(--c-text);
+  font-family:'DM Sans', sans-serif;
+  font-weight:300;
+  line-height:1.7;
+  font-size:15px;
+}
+
+/* ---- SIDEBAR + LAYOUT ---- */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:260px;
+  min-width:260px;
+  background:var(--c-surface);
+  border-right:1px solid var(--c-border);
+  position:fixed;
+  top:0;left:0;bottom:0;
+  overflow-y:auto;
+  z-index:200;
+  display:flex;flex-direction:column;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--c-border2);border-radius:2px}
+.sidebar-logo{
+  padding:1.5rem 1.25rem 1rem;
+  border-bottom:1px solid var(--c-border);
+}
+.logo-mark{
+  font-family:'DM Serif Display',serif;
+  font-size:1.35rem;
+  color:var(--c-text);
+  letter-spacing:-0.02em;
+}
+.logo-mark span{color:var(--c-accent)}
+.logo-sub{
+  font-family:'DM Mono',monospace;
+  font-size:9px;
+  color:var(--c-text3);
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  margin-top:2px;
+}
+.sidebar-section{padding:0.75rem 0}
+.sidebar-section-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;
+  font-weight:500;
+  color:var(--c-text3);
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:0.5rem 1.25rem 0.25rem;
+}
+.guide-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;text-align:left;
+  padding:0.6rem 1.25rem;
+  background:none;border:none;cursor:pointer;
+  color:var(--c-text2);
+  font-family:'DM Sans',sans-serif;
+  font-size:13.5px;font-weight:400;
+  transition:all 0.15s;
+  border-left:2px solid transparent;
+}
+.guide-btn:hover{color:var(--c-text);background:var(--c-bg)}
+.guide-btn.active{color:var(--c-accent);background:var(--c-accent-l);border-left-color:var(--c-accent);font-weight:500}
+.guide-icon{
+  width:26px;height:26px;border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:9px;font-weight:500;
+  flex-shrink:0;
+}
+.sidebar-footer{
+  margin-top:auto;
+  padding:1rem 1.25rem;
+  border-top:1px solid var(--c-border);
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--c-text3);
+  letter-spacing:0.06em;
+}
+
+/* ---- CHAPTER NAV ---- */
+.chapter-nav{
+  border-top:1px solid var(--c-border);
+  padding:0.5rem 0;
+}
+.chapter-btn{
+  display:block;width:100%;text-align:left;
+  padding:0.4rem 1.25rem 0.4rem 2.75rem;
+  background:none;border:none;cursor:pointer;
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:var(--c-text3);letter-spacing:0.03em;
+  transition:color 0.15s;
+}
+.chapter-btn:hover{color:var(--c-accent)}
+.chapter-btn.active{color:var(--c-accent);font-weight:500}
+
+/* ---- MAIN CONTENT ---- */
+.main{margin-left:260px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{
+  background:var(--c-surface);
+  border-bottom:1px solid var(--c-border);
+  padding:0.875rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-guide{font-family:'DM Mono',monospace;font-size:11px;color:var(--c-text3);letter-spacing:0.08em;text-transform:uppercase}
+.topbar-title{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--c-text)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--c-text2)}
+
+.content{flex:1;padding:2.5rem 2rem;max-width:900px}
+
+/* ---- TYPOGRAPHY ---- */
+.guide-header{margin-bottom:2.5rem}
+.guide-tag{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--c-accent);letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;
+}
+.guide-tag::before{content:'';display:inline-block;width:20px;height:1px;background:var(--c-accent)}
+.guide-h1{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.8rem,3vw,2.4rem);
+  line-height:1.2;letter-spacing:-0.02em;
+  color:var(--c-text);margin-bottom:0.5rem;
+}
+.guide-desc{font-size:0.9rem;color:var(--c-text2);max-width:620px;font-style:italic}
+
+h2{
+  font-family:'DM Serif Display',serif;
+  font-size:1.4rem;letter-spacing:-0.01em;
+  color:var(--c-text);margin:2.5rem 0 0.75rem;
+  padding-top:2rem;
+  border-top:1px solid var(--c-border);
+}
+h2:first-of-type{margin-top:0;padding-top:0;border-top:none}
+h3{
+  font-size:0.95rem;font-weight:500;
+  color:var(--c-text);margin:1.5rem 0 0.5rem;
+}
+h4{
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+  color:var(--c-accent);letter-spacing:0.12em;text-transform:uppercase;
+  margin:1.25rem 0 0.5rem;
+}
+p{font-size:0.9rem;color:var(--c-text2);margin-bottom:0.6rem;line-height:1.8}
+ul,ol{padding-left:1.5rem;margin-bottom:0.75rem}
+li{font-size:0.88rem;color:var(--c-text2);line-height:1.8}
+strong{color:var(--c-text);font-weight:500}
+
+/* ---- CARDS ---- */
+.card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:1.25rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+@media(max-width:700px){.two-col,.three-col{grid-template-columns:1fr}}
+
+/* ---- BADGES ---- */
+.badge{
+  display:inline-block;
+  font-family:'DM Mono',monospace;font-size:9px;font-weight:500;
+  letter-spacing:0.07em;text-transform:uppercase;
+  padding:2px 7px;border-radius:var(--r);border:1px solid;
+}
+.b-red{background:var(--c-red-l);color:var(--c-red);border-color:rgba(192,57,43,0.25)}
+.b-green{background:var(--c-green-l);color:var(--c-green);border-color:rgba(26,107,58,0.25)}
+.b-amber{background:var(--c-amber-l);color:var(--c-amber);border-color:rgba(139,94,0,0.25)}
+.b-blue{background:var(--c-accent-l);color:var(--c-accent);border-color:rgba(44,74,140,0.25)}
+.b-purple{background:var(--c-purple-l);color:var(--c-purple);border-color:rgba(91,62,166,0.25)}
+.b-teal{background:var(--c-teal-l);color:var(--c-teal);border-color:rgba(26,102,112,0.25)}
+.b-slate{background:var(--c-slate-l);color:var(--c-slate);border-color:rgba(61,80,104,0.25)}
+
+/* ---- TABLES ---- */
+.table-wrap{overflow-x:auto;margin-bottom:1rem;border-radius:var(--r-lg);border:1px solid var(--c-border);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:0.83rem}
+th{
+  font-family:'DM Mono',monospace;font-size:9px;font-weight:500;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--c-text2);
+  background:var(--c-bg);padding:10px 12px;text-align:left;
+  border-bottom:1px solid var(--c-border);
+}
+td{padding:9px 12px;border-bottom:1px solid var(--c-border);color:var(--c-text2);vertical-align:top;line-height:1.55}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+
+/* ---- METRICS ---- */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
+.metric{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:1rem 1.1rem;box-shadow:var(--shadow)}
+.metric-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--c-text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px}
+.metric-value{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--c-accent);letter-spacing:-0.01em}
+.metric-sub{font-size:0.75rem;color:var(--c-text3);margin-top:2px}
+
+/* ---- STEPS ---- */
+.step-list{list-style:none;padding:0;counter-reset:stp}
+.step-list li{
+  counter-increment:stp;position:relative;
+  padding:0.75rem 0 0.75rem 3rem;
+  border-bottom:1px solid var(--c-border);
+  font-size:0.88rem;color:var(--c-text2);line-height:1.7;
+}
+.step-list li:last-child{border-bottom:none}
+.step-list li::before{
+  content:counter(stp,'decimal-leading-zero');
+  position:absolute;left:0;top:0.8rem;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+  color:var(--c-accent);
+  background:var(--c-accent-l);
+  border:1px solid rgba(44,74,140,0.2);
+  width:26px;height:20px;display:flex;align-items:center;justify-content:center;
+  border-radius:var(--r);
+}
+
+/* ---- INFO/WARNING BOXES ---- */
+.info-box{
+  background:var(--c-accent-l);border:1px solid rgba(44,74,140,0.2);
+  border-left:3px solid var(--c-accent);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--c-text2);
+}
+.warn-box{
+  background:var(--c-red-l);border:1px solid rgba(192,57,43,0.2);
+  border-left:3px solid var(--c-red);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--c-text2);
+}
+.key-box{
+  background:var(--c-amber-l);border:1px solid rgba(139,94,0,0.2);
+  border-left:3px solid var(--c-amber);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:var(--c-text2);
+}
+
+/* ---- PHASE BOXES ---- */
+.phase{border-left:2px solid;padding:0.6rem 1rem;margin-bottom:0.5rem;border-radius:0 var(--r) var(--r) 0}
+.ph-blue{border-color:var(--c-accent);background:var(--c-accent-l)}
+.ph-red{border-color:var(--c-red);background:var(--c-red-l)}
+.ph-green{border-color:var(--c-green);background:var(--c-green-l)}
+.ph-amber{border-color:var(--c-amber);background:var(--c-amber-l)}
+.ph-purple{border-color:var(--c-purple);background:var(--c-purple-l)}
+.ph-teal{border-color:var(--c-teal);background:var(--c-teal-l)}
+.ph-slate{border-color:var(--c-slate);background:var(--c-slate-l)}
+.phase .pt{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;color:var(--c-text)}
+.phase p{margin:0;font-size:0.83rem}
+
+/* ---- ECG ---- */
+.ecg-wrap{background:#f0f7f0;border:1px solid #c8e0c8;border-radius:var(--r-lg);overflow:hidden;margin-bottom:1rem}
+.ecg-top{background:#e6f0e6;border-bottom:1px solid #c8e0c8;padding:7px 14px;display:flex;align-items:center;justify-content:space-between}
+.ecg-name{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#1A4A1A;letter-spacing:0.08em;text-transform:uppercase}
+.ecg-svg{display:block;width:100%}
+.ecg-note{padding:8px 14px;font-family:'DM Mono',monospace;font-size:9px;color:#3A6A3A;line-height:1.5;border-top:1px solid #c8e0c8;background:#e6f0e6}
+.ecg-grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.ecg-grid2{grid-template-columns:1fr}}
+
+/* ---- ANATOMY SVG ---- */
+.anatomy-wrap{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.anatomy-wrap svg{display:block;width:100%;max-width:600px;margin:0 auto}
+
+/* ---- TOXIDROME CARDS ---- */
+.tox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1rem}
+.tox-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:1.1rem 1.25rem;box-shadow:var(--shadow)}
+.tox-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem}
+.tox-name{font-weight:500;font-size:0.93rem}
+.tox-body{font-size:0.83rem;color:var(--c-text2);line-height:1.7}
+.tox-row{display:flex;gap:6px;margin-bottom:3px;align-items:baseline}
+.tox-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--c-text3);letter-spacing:0.06em;min-width:80px;flex-shrink:0}
+
+/* ---- RUSH ZONES ---- */
+.rush-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:1rem}
+.rush-zone{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:1rem 1.1rem;box-shadow:var(--shadow)}
+.rush-zone-header{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px}
+.rush-zone-num{
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:500;
+}
+.rush-zone p{font-size:0.81rem;color:var(--c-text2);margin:0}
+
+/* ---- SCENARIO ---- */
+.scenario{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem;box-shadow:var(--shadow)}
+.scenario-tag{font-family:'DM Mono',monospace;font-size:9px;color:var(--c-accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem}
+.scenario-title{font-family:'DM Serif Display',serif;font-size:1.05rem;margin-bottom:0.75rem}
+
+/* ---- GUIDE PAGES (hidden/shown) ---- */
+.guide-page{display:none}
+.guide-page.active{display:block}
+.chapter{display:none}
+.chapter.active{display:block}
+
+/* ---- MOBILE ---- */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform 0.25s ease}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .content{padding:1.5rem 1rem}
+  .topbar{padding:0.75rem 1rem}
+}
+
+/* ---- DIVIDER ---- */
+hr{border:none;border-top:1px solid var(--c-border);margin:1.5rem 0}
+
+/* ---- PRINT ---- */
+@media print{
+  .sidebar,.topbar{display:none}
+  .main{margin-left:0}
+  .guide-page,.chapter{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">Med<span>Ref</span></div>
+    <div class="logo-sub">Urgencias Hospitalarias · Edición Clínica</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Guías clínicas</div>
+
+    <button class="guide-btn active" onclick="loadGuide('acls')">
+      <div class="guide-icon" style="background:var(--c-red-l);color:var(--c-red)">RCP</div>
+      ACLS — Reanimación
+    </button>
+    <div class="chapter-nav" id="chap-acls">
+      <button class="chapter-btn active" onclick="loadChapter('acls','c1')">01 · Fisiología &amp; ECG</button>
+      <button class="chapter-btn" onclick="loadChapter('acls','c2')">02 · Farmacología</button>
+      <button class="chapter-btn" onclick="loadChapter('acls','c3')">03 · Equipo &amp; Dinámica</button>
+      <button class="chapter-btn" onclick="loadChapter('acls','c4')">04 · Ritmos de paro</button>
+      <button class="chapter-btn" onclick="loadChapter('acls','c5')">05 · Trazados ECG</button>
+      <button class="chapter-btn" onclick="loadChapter('acls','c6')">06 · Casos clínicos</button>
+    </div>
+
+    <button class="guide-btn" onclick="loadGuide('atls')">
+      <div class="guide-icon" style="background:var(--c-amber-l);color:var(--c-amber)">TRM</div>
+      ATLS — Trauma
+    </button>
+    <div class="chapter-nav" id="chap-atls" style="display:none">
+      <button class="chapter-btn" onclick="loadChapter('atls','c1')">01 · Primary Survey (ABCDE)</button>
+      <button class="chapter-btn" onclick="loadChapter('atls','c2')">02 · Secondary Survey</button>
+      <button class="chapter-btn" onclick="loadChapter('atls','c3')">03 · Shock en trauma</button>
+      <button class="chapter-btn" onclick="loadChapter('atls','c4')">04 · Trauma torácico</button>
+      <button class="chapter-btn" onclick="loadChapter('atls','c5')">05 · TCE &amp; Columna</button>
+      <button class="chapter-btn" onclick="loadChapter('atls','c6')">06 · Trauma abdominal</button>
+    </div>
+
+    <button class="guide-btn" onclick="loadGuide('tox')">
+      <div class="guide-icon" style="background:var(--c-purple-l);color:var(--c-purple)">TOX</div>
+      Toxidromes
+    </button>
+    <div class="chapter-nav" id="chap-tox" style="display:none">
+      <button class="chapter-btn" onclick="loadChapter('tox','c1')">01 · Reconocimiento</button>
+      <button class="chapter-btn" onclick="loadChapter('tox','c2')">02 · Simpaticomimético</button>
+      <button class="chapter-btn" onclick="loadChapter('tox','c3')">03 · Colinérgico &amp; Anticolinérgico</button>
+      <button class="chapter-btn" onclick="loadChapter('tox','c4')">04 · Opiáceos &amp; Sedantes</button>
+      <button class="chapter-btn" onclick="loadChapter('tox','c5')">05 · Antídotos clave</button>
+    </div>
+
+    <button class="guide-btn" onclick="loadGuide('sri')">
+      <div class="guide-icon" style="background:var(--c-teal-l);color:var(--c-teal)">SRI</div>
+      Vía aérea avanzada
+    </button>
+    <div class="chapter-nav" id="chap-sri" style="display:none">
+      <button class="chapter-btn" onclick="loadChapter('sri','c1')">01 · Anatomía de la VA</button>
+      <button class="chapter-btn" onclick="loadChapter('sri','c2')">02 · Los 7 pasos SRI</button>
+      <button class="chapter-btn" onclick="loadChapter('sri','c3')">03 · Farmacología SRI</button>
+      <button class="chapter-btn" onclick="loadChapter('sri','c4')">04 · VA difícil &amp; Rescate</button>
+    </div>
+
+    <button class="guide-btn" onclick="loadGuide('rush')">
+      <div class="guide-icon" style="background:var(--c-slate-l);color:var(--c-slate)">ECO</div>
+      Protocolo RUSH
+    </button>
+    <div class="chapter-nav" id="chap-rush" style="display:none">
+      <button class="chapter-btn" onclick="loadChapter('rush','c1')">01 · Fundamentos &amp; Pump</button>
+      <button class="chapter-btn" onclick="loadChapter('rush','c2')">02 · Tank &amp; Pipes</button>
+      <button class="chapter-btn" onclick="loadChapter('rush','c3')">03 · POCUS en paro</button>
+      <button class="chapter-btn" onclick="loadChapter('rush','c4')">04 · Casos &amp; Hallazgos</button>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">MedRef v2.0 · Solo uso educativo<br>No reemplaza entrenamiento certificado</div>
+</aside>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-guide" id="tbar-guide">ACLS · REANIMACIÓN</div>
+      <div class="topbar-title" id="tbar-title">Fisiología cardiovascular y ECG básico</div>
+    </div>
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect y="3" width="20" height="1.5" rx="1" fill="currentColor"/><rect y="9.25" width="20" height="1.5" rx="1" fill="currentColor"/><rect y="15.5" width="20" height="1.5" rx="1" fill="currentColor"/></svg>
+    </button>
+  </div>
+
+  <div class="content">
+
+  <!-- ███████████████████████████████████████████████
+       GUÍA 1: ACLS
+  ███████████████████████████████████████████████ -->
+  <div class="guide-page active" id="g-acls">
+
+    <!-- ACLS · CAP 1 -->
+    <div class="chapter active" id="acls-c1">
+      <div class="guide-header">
+        <div class="guide-tag">ACLS · Capítulo 01</div>
+        <h1 class="guide-h1">Fisiología cardiovascular<br>y ECG básico</h1>
+        <p class="guide-desc">Fundamentos electrofisiológicos, potencial de acción y lectura sistemática del electrocardiograma</p>
+      </div>
+
+      <h2>Potencial de acción cardíaco</h2>
+      <div class="two-col">
+        <div class="card">
+          <h4>Célula marcapasos — Nodo SA/AV</h4>
+          <div class="phase ph-purple"><div class="pt">Fase 4 — Automatismo espontáneo</div><p>Corriente If ("funny") de Na⁺ + cierre de IK. Despolarización lenta y espontánea. Genera el ritmo cardíaco intrínseco.</p></div>
+          <div class="phase ph-blue"><div class="pt">Fase 0 — Despolarización lenta</div><p>Entrada de Ca²⁺ por canales tipo L. Ascenso suave (≠ miocito ventricular).</p></div>
+          <div class="phase ph-green"><div class="pt">Fase 3 — Repolarización</div><p>Salida de K⁺ (corriente IK). Regresa al potencial de reposo (−60 mV) para reiniciar el ciclo.</p></div>
+          <p style="font-size:0.78rem;margin-top:8px;color:var(--c-text3)">No tiene fases 1 ni 2 (meseta) bien diferenciadas.</p>
+        </div>
+        <div class="card">
+          <h4>Miocito ventricular</h4>
+          <div class="phase ph-slate"><div class="pt">Fase 4 — Reposo</div><p>Potencial de membrana: −90 mV. Canal IK1 mantiene K⁺ hacia afuera.</p></div>
+          <div class="phase ph-red"><div class="pt">Fase 0 — Despolarización rápida</div><p>Entrada rápida de Na⁺ por Nav1.5. Ascenso casi vertical (0→+30 mV en &lt;2 ms). Período refractario absoluto.</p></div>
+          <div class="phase ph-blue"><div class="pt">Fase 1 — Repolarización inicial</div><p>Salida transitoria de K⁺ (corriente Ito). Muesca inicial tras el pico.</p></div>
+          <div class="phase ph-amber"><div class="pt">Fase 2 — Meseta (~200 ms)</div><p>Equilibrio Ca²⁺ (entra por ICaL) y K⁺ (sale por IKr/IKs). Acoplamiento excitación-contracción. Período refractario efectivo.</p></div>
+          <div class="phase ph-green"><div class="pt">Fase 3 — Repolarización final</div><p>Salida masiva K⁺ (IKr, IKs, IK1). Regresa a −90 mV. Período refractario relativo.</p></div>
+        </div>
+      </div>
+
+      <h2>Componentes del ECG</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Componente</th><th>Representa</th><th>Duración normal</th><th>Cuadros pequeños</th><th>Claves</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Onda P</strong></td><td>Despolarización auricular</td><td>≤ 120 ms · ≤ 0.25 mV</td><td>≤ 3</td><td>Positiva en II, aVF, V4–V6</td></tr>
+            <tr><td><strong>Intervalo PR</strong></td><td>Conducción AV (nodo AV + His)</td><td>120–200 ms</td><td>3–5</td><td>>200 ms = BAV 1° </td></tr>
+            <tr><td><strong>QRS</strong></td><td>Despolarización ventricular</td><td><strong>≤ 120 ms</strong></td><td><strong>≤ 3</strong></td><td>>120 ms = BRI / BRD / ritmo ventricular</td></tr>
+            <tr><td><strong>Segmento ST</strong></td><td>Meseta ventricular (fase 2)</td><td>Isoeléctrico ± 1 mm</td><td>—</td><td>↑ = lesión / ↓ = isquemia/digoxina</td></tr>
+            <tr><td><strong>Onda T</strong></td><td>Repolarización ventricular</td><td>Asimétrica, positiva en I,II,V4–V6</td><td>—</td><td>T alta y picuda = hiperpotasemia</td></tr>
+            <tr><td><strong>Intervalo QT</strong></td><td>Sístole eléctrica completa</td><td>QTc ≤ 440 ms ♂ · ≤ 460 ms ♀</td><td>&lt;½ RR</td><td>↑ QTc → riesgo de Torsades</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">QRS normal</div><div class="metric-value">≤120ms</div><div class="metric-sub">≤ 3 cuadros pequeños</div></div>
+        <div class="metric"><div class="metric-label">QRS ancho</div><div class="metric-value">&gt;120ms</div><div class="metric-sub">BRI · BRD · origen ventricular</div></div>
+        <div class="metric"><div class="metric-label">Intervalo PR</div><div class="metric-value">120–200</div><div class="metric-sub">ms a 25 mm/s</div></div>
+        <div class="metric"><div class="metric-label">1 cuadro pequeño</div><div class="metric-value">40ms</div><div class="metric-sub">1 mm a 25 mm/s</div></div>
+        <div class="metric"><div class="metric-label">FC rápida</div><div class="metric-value">300÷n</div><div class="metric-sub">n = cuadros grandes entre R-R</div></div>
+      </div>
+      <div class="info-box"><strong>Regla práctica:</strong> A 25 mm/s → 1 cuadro pequeño = 1 mm = 40 ms. 5 cuadros pequeños = 1 cuadro grande = 200 ms. Para FC: 300 ÷ (nº cuadros grandes entre dos R).</div>
+    </div>
+
+    <!-- ACLS · CAP 2 -->
+    <div class="chapter" id="acls-c2">
+      <div class="guide-header">
+        <div class="guide-tag">ACLS · Capítulo 02</div>
+        <h1 class="guide-h1">Farmacología de la reanimación</h1>
+        <p class="guide-desc">Fármacos esenciales del algoritmo ACLS — dosis, mecanismos e indicaciones</p>
+      </div>
+      <div class="info-box">Todas las dosis son para adultos. En paro, la vía IO es equivalente a la IV en velocidad de acción.</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fármaco</th><th>Mecanismo</th><th>Dosis en paro</th><th>Dosis periparo</th><th>Indicaciones</th><th>Contraindicaciones / Precauciones</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Adrenalina</strong><br><span class="badge b-red">1ª línea</span></td><td>Agonista α1+β. Vasoconstricción → ↑PAD → ↑perfusión coronaria y cerebral</td><td>1 mg IV/IO c/3–5 min</td><td>Bradicardia: 2–10 mcg/min<br>Anafilaxia: 0.3 mg IM</td><td>FV, TVSP, Asistolia, AESP</td><td>Precaución en gestantes. No como monoterapia en TV estable con pulso</td></tr>
+            <tr><td><strong>Amiodarona</strong><br><span class="badge b-blue">Antiarrítmico</span></td><td>Bloquea Na⁺, K⁺, Ca²⁺ + α/β. Prolonga QT y PR</td><td>300 mg IV/IO bolo → 150 mg si persiste</td><td>TV estable: 150 mg en 10 min → 1 mg/min ×6h</td><td>FV/TVSP refractaria a desfibrilación</td><td><strong>CI en Torsades</strong> (prolonga QT). Hipotensión. Hepatotoxicidad crónica</td></tr>
+            <tr><td><strong>Lidocaína</strong><br><span class="badge b-blue">Antiarrítmico</span></td><td>Bloquea Na⁺ rápidos. Estabiliza membrana. Acorta PA</td><td>1–1.5 mg/kg IV → 0.5–0.75 mg/kg c/5–10 min (máx 3 mg/kg)</td><td>Mantenimiento: 1–4 mg/min IV</td><td>FV/TVSP sin amiodarona. TV monomórfica</td><td>Toxicidad SNC (convulsiones). Evitar en BAV alto grado</td></tr>
+            <tr><td><strong>Atropina</strong><br><span class="badge b-amber">Vagolítico</span></td><td>Anticolinérgico M2. ↑automatismo SA y conducción AV</td><td>No indicada en asistolia/AESP (AHA 2010)</td><td>Bradicardia sintomática: 0.5 mg IV c/3–5 min (máx 3 mg)</td><td>Bradicardia sinusal, BAV 1° y Mobitz I sintomáticos</td><td>Ineficaz en trasplante. No usar en BAV 3° ni Mobitz II</td></tr>
+            <tr><td><strong>Sulfato Mg²⁺</strong><br><span class="badge b-green">Electrolito</span></td><td>Bloquea Ca²⁺. Estabiliza membrana. ↓corriente de entrada fase 2</td><td>Torsades: 1–2 g IV en 1–2 min</td><td>Eclampsia: 4–6 g IV → 1–2 g/h</td><td>Torsades de Pointes, hipomagnesemia, preeclampsia</td><td>Acumulación en IRC. Antídoto: gluconato Ca²⁺ 1 g IV</td></tr>
+            <tr><td><strong>Adenosina</strong><br><span class="badge b-blue">Antiarrítmico</span></td><td>Agonista A1. Hiperpolariza nodo AV → bloqueo AV transitorio</td><td>No aplica en paro</td><td>6 mg IV rápido → 12 mg → 12 mg (flush 20 mL SF)</td><td>TSVP. Dx diferencial TV vs TSV con aberrancia</td><td>Asma severa, BAV 2°/3°, síndrome seno enfermo. T½ ~10 s</td></tr>
+            <tr><td><strong>Bicarbonato Na⁺</strong></td><td>Tampón. Corrige acidosis metabólica</td><td>1 mEq/kg IV/IO (guiado por gasometría)</td><td>Hiperpotasemia, intox. tricíclicos</td><td>Acidosis severa (pH &lt;7.1), hiperpotasemia, sobredosis ATC</td><td>Empeora hipercapnia. Inactiva catecolaminas si se mezclan</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACLS · CAP 3 -->
+    <div class="chapter" id="acls-c3">
+      <div class="guide-header">
+        <div class="guide-tag">ACLS · Capítulo 03</div>
+        <h1 class="guide-h1">Equipo y dinámica de reanimación</h1>
+        <p class="guide-desc">Roles, comunicación en bucle cerrado y organización del código</p>
+      </div>
+      <h2>Roles del equipo de código</h2>
+      <div class="card-grid">
+        <div class="card"><h4 style="color:var(--c-red)">Compresor</h4><ul><li>Al lado derecho del paciente</li><li>100–120 compresiones/min, profundidad 5–6 cm</li><li>Retroceso torácico completo entre compresiones</li><li><strong>Rotar cada 2 minutos</strong> para evitar fatiga</li><li>Interrupciones &lt; 10 s. Meta CCF &gt; 80%</li></ul></div>
+        <div class="card"><h4 style="color:var(--c-accent)">Líder del equipo</h4><ul><li>Posicionado a los <strong>pies</strong> del paciente (visión global)</li><li>Dirige, toma decisiones clínicas, NO realiza maniobras</li><li>Comunicación en bucle cerrado</li><li>Gestiona tiempo y ciclos de 2 min</li><li>Anuncia ritmo y toma de decisiones en cada pausa</li></ul></div>
+        <div class="card"><h4 style="color:var(--c-green)">Vía aérea</h4><ul><li>En la cabecera del paciente</li><li>BVM técnica C-E con sello adecuado</li><li>Intubación / dispositivos supraglóticos</li><li>Confirmar EtCO₂ post-intubación</li><li>1 ventilación c/6 s (10/min) post-intubación</li></ul></div>
+        <div class="card"><h4 style="color:var(--c-amber)">Monitor / Desfibrilador</h4><ul><li>Coloca electrodos y parches multifunción</li><li>Opera el desfibrilador. Carga y descarga el choque</li><li>Anuncia ritmo en voz alta al equipo</li><li>Verifica pausa pre-choque &lt; 5 s</li></ul></div>
+        <div class="card"><h4 style="color:var(--c-purple)">Accesos y fármacos</h4><ul><li>Canaliza acceso periférico o IO</li><li>Prepara y administra medicamentos</li><li>Confirma dosis antes de administrar</li><li>Reporta administración al líder con hora exacta</li></ul></div>
+        <div class="card"><h4 style="color:var(--c-teal)">Registrador / Tiempo</h4><ul><li>Anota hora de inicio, tiempos de desfibrilación</li><li>Registra fármacos con hora y dosis</li><li>Avisa al líder cuando la adrenalina es debida</li><li>Avisa rotación de compresor cada 2 min</li></ul></div>
+      </div>
+
+      <h2>Comunicación en bucle cerrado</h2>
+      <div class="card">
+        <ol class="step-list">
+          <li><strong>Líder emite orden clara con nombre:</strong> <em>"Ana, administra adrenalina 1 mg IV ahora."</em></li>
+          <li><strong>Receptor confirma la orden recibida:</strong> <em>"Confirmo: adrenalina 1 mg IV."</em></li>
+          <li><strong>Receptor ejecuta y notifica:</strong> <em>"Adrenalina 1 mg IV administrada a las 14:23."</em></li>
+          <li><strong>Líder acusa recibo y continúa:</strong> <em>"Recibido. Próxima adrenalina en 3–5 minutos."</em></li>
+        </ol>
+      </div>
+      <div class="key-box"><strong>Principios de los equipos de alto rendimiento:</strong> roles claros desde el inicio · sin ego en el liderazgo · comunicación asertiva · ambiente de "seguridad psicológica" · debriefing post-código para mejorar el desempeño del equipo.</div>
+    </div>
+
+    <!-- ACLS · CAP 4 -->
+    <div class="chapter" id="acls-c4">
+      <div class="guide-header">
+        <div class="guide-tag">ACLS · Capítulo 04</div>
+        <h1 class="guide-h1">Ritmos de paro y arritmias</h1>
+        <p class="guide-desc">Clasificación, reconocimiento y manejo de los ritmos de paro cardiorrespiratorio</p>
+      </div>
+
+      <h2>Ritmos desfibrilables</h2>
+      <div class="two-col">
+        <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="badge b-red">Desfibrilable</span><strong>Fibrilación ventricular</strong></div><p>Actividad eléctrica caótica. Sin QRS ni T identificables. Oscilaciones irregulares de amplitud y frecuencia variable. Valorar en DII y V1. Puede ser de <em>amplitud gruesa</em> (más tratable) o <em>fina</em> (peor pronóstico).</p><p><strong>Tratamiento:</strong> 200 J bifásico inmediato. Reanudar RCP sin verificar ritmo. Adrenalina + amiodarona en ciclos posteriores.</p></div>
+        <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="badge b-red">Desfibrilable</span><strong>TV sin pulso (TVSP)</strong></div><p>QRS anchos (&gt;120 ms) regulares a &gt;100 lpm. Sin pulso palpable. Puede ser <em>monomórfica</em> (misma morfología) o <em>polimórfica</em>. Sin gasto cardíaco efectivo.</p><p><strong>Tratamiento:</strong> idéntico a FV → desfibrilación 200 J bifásico inmediata.</p></div>
+      </div>
+
+      <h2>Ritmos no desfibrilables</h2>
+      <div class="two-col">
+        <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="badge b-amber">No desfibrilable</span><strong>Asistolia</strong></div><p>Línea isoeléctrica. Ausencia total de actividad eléctrica. <strong>Siempre confirmar en ≥2 derivadas</strong> (descartar FV fina o mal contacto de electrodos). Peor pronóstico de los ritmos de paro.</p><p><strong>Tratamiento:</strong> RCP de alta calidad + Adrenalina 1 mg c/3–5 min + búsqueda activa de H y T.</p></div>
+        <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="badge b-amber">No desfibrilable</span><strong>AESP</strong></div><p>Actividad eléctrica organizada en monitor (cualquier ritmo) sin pulso central palpable. La causa siempre es reversible. Buscar y corregir la causa es el objetivo principal.</p><p><strong>Tratamiento:</strong> RCP + Adrenalina + identificar y tratar la causa (H y T) — POCUS si disponible.</p></div>
+      </div>
+
+      <h2>Causas reversibles — H y T</h2>
+      <div class="two-col">
+        <div class="card">
+          <h4>Las 6 H</h4>
+          <table><tbody>
+            <tr><td><strong>Hipoxia</strong></td><td>Optimizar vía aérea y ventilación</td></tr>
+            <tr><td><strong>Hipovolemia</strong></td><td>Fluidos IV/IO, control hemostasia</td></tr>
+            <tr><td><strong>H⁺ (acidosis)</strong></td><td>HCO₃⁻ si pH &lt;7.1, ventilación adecuada</td></tr>
+            <tr><td><strong>Hipo/Hiperpotasemia</strong></td><td>Ca²⁺, insulina/glucosa, kayexalate</td></tr>
+            <tr><td><strong>Hipoglucemia</strong></td><td>Dextrosa 50% 50 mL IV</td></tr>
+            <tr><td><strong>Hipotermia</strong></td><td>Recalentamiento activo externo e interno</td></tr>
+          </tbody></table>
+        </div>
+        <div class="card">
+          <h4>Las 5 T</h4>
+          <table><tbody>
+            <tr><td><strong>Neumotórax a Tensión</strong></td><td>Aguja 2° EIC + pleurostomía</td></tr>
+            <tr><td><strong>Taponamiento cardíaco</strong></td><td>Pericardiocentesis de urgencia</td></tr>
+            <tr><td><strong>Trombosis coronaria</strong></td><td>Trombolisis o cateterismo emergente</td></tr>
+            <tr><td><strong>Tromboembolismo pulmonar</strong></td><td>Alteplasa 50 mg IV bolo</td></tr>
+            <tr><td><strong>Tóxicos / drogas</strong></td><td>Antídotos específicos (naloxona, etc.)</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <h2>Torsades de Pointes</h2>
+      <div class="card">
+        <p><strong>Morfología:</strong> QRS polimórfico que "gira" alrededor de la línea isoeléctrica. FC 150–250 lpm. Siempre en contexto de QTc prolongado.</p>
+        <h4>Precipitantes del QT largo</h4>
+        <ul>
+          <li><strong>Fármacos:</strong> Amiodarona, sotalol, haloperidol, metadona, macrólidos, fluoroquinolonas, antifúngicos azólicos</li>
+          <li><strong>Electrolíticas:</strong> Hipomagnesemia, hipopotasemia, hipocalcemia</li>
+          <li><strong>Genéticas:</strong> Síndrome QT largo congénito (KCNQ1, HERG, SCN5A)</li>
+          <li><strong>Otras:</strong> Bradicardia severa (pausa-dependiente), isquemia, hipotiroidismo</li>
+        </ul>
+        <h4>Tratamiento</h4>
+        <ol style="padding-left:1.25rem;font-size:0.88rem;color:var(--c-text2)">
+          <li>Paro → desfibrilación + RCP estándar</li>
+          <li><strong>Sulfato Mg²⁺ 1–2 g IV en 1–2 min</strong> (elección aunque el Mg sea normal)</li>
+          <li>Corregir K⁺ meta &gt;4.5 mEq/L y Ca²⁺</li>
+          <li>Suspender todos los fármacos que prolongan QT</li>
+          <li>Marcapasos transcutáneo (overdrive pacing) si recurrente</li>
+          <li><strong>NO amiodarona</strong> — prolonga QT y empeora el cuadro</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ACLS · CAP 5 -->
+    <div class="chapter" id="acls-c5">
+      <div class="guide-header">
+        <div class="guide-tag">ACLS · Capítulo 05</div>
+        <h1 class="guide-h1">Trazados ECG ilustrados</h1>
+        <p class="guide-desc">Representaciones esquemáticas de los principales ritmos en urgencias y reanimación</p>
+      </div>
+
+      <h2>Ritmos de referencia</h2>
+      <div class="ecg-grid2">
+        <!-- ECG Normal -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">Ritmo sinusal normal</span><span class="badge b-green">Normal</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="g1s" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0L0 0 0 8" fill="none" stroke="#c8dcc8" stroke-width="0.3"/></pattern>
+              <pattern id="g1l" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="url(#g1s)"/><path d="M40 0L0 0 0 40" fill="none" stroke="#b0ccb0" stroke-width="0.6"/></pattern>
+            </defs>
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <polyline points="5,55 38,55 46,47 50,42 54,47 58,55 66,55 68,28 71,55 76,55 84,48 92,55 115,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+            <polyline points="115,55 148,55 156,47 160,42 164,47 168,55 176,55 178,28 181,55 186,55 194,48 202,55 225,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+            <polyline points="225,55 258,55 266,47 270,42 274,47 278,55 286,55 288,28 291,55 296,55 304,48 312,55 335,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+            <polyline points="335,55 368,55 376,47 380,42 384,47 388,55 396,55 398,28 401,55 406,55 414,48 422,55 440,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+            <text x="44" y="40" fill="#1A6B3A" font-size="7" font-family="monospace" opacity="0.8">P</text>
+            <text x="68" y="24" fill="#1A6B3A" font-size="7" font-family="monospace" opacity="0.8">R</text>
+            <text x="86" y="46" fill="#1A6B3A" font-size="7" font-family="monospace" opacity="0.8">T</text>
+          </svg>
+          <div class="ecg-note">FC ~75 lpm · P positiva en II · PR 160 ms · QRS ≤80 ms · QT normal · Eje 60°</div>
+        </div>
+
+        <!-- Flutter auricular -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">Flutter auricular</span><span class="badge b-amber">Supraventricular</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <polyline points="5,55 12,42 18,60 25,42 31,60 38,42 44,60 51,42 57,60 64,42 70,60 77,42 83,60 90,42 96,60 103,42 109,60 116,42 122,60 129,42 135,60 142,42 148,60 155,42 161,60 168,42 174,60 181,42 187,60 194,42 200,60 207,42 213,60 220,42 226,60 233,42 239,60 246,42 252,60 259,42 265,60 272,42 278,60 285,42 291,60 298,42 304,60 311,42 317,60 324,42 330,60 337,42 343,60 350,42 356,60 363,42 369,60 376,42 382,60 389,42 395,60 402,42 408,60 415,42 421,60 428,42 435,55" fill="none" stroke="rgba(26,107,58,0.4)" stroke-width="1" stroke-linejoin="round"/>
+            <polyline points="5,55 37,55 39,30 42,55 46,55 51,50 58,55" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="84,55 116,55 118,30 121,55 125,55 130,50 137,55" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="163,55 195,55 197,30 200,55 204,55 209,50 216,55" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="242,55 274,55 276,30 279,55 283,55 288,50 295,55" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="321,55 353,55 355,30 358,55 362,55 367,50 374,55" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="400,55 432,55 434,30 437,55 440,55" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          <div class="ecg-note">Ondas F en "diente de sierra" ~300 lpm · Conducción AV 2:1 → FC ventricular ~150 lpm · QRS estrecho</div>
+        </div>
+
+        <!-- FA -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">Fibrilación auricular</span><span class="badge b-amber">Supraventricular</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <polyline points="5,55 9,53 13,57 17,54 21,56 25,52 29,57 33,54 37,53 41,30 44,55 49,57 54,54 59,56 64,53 69,55 74,57 78,53 81,30 84,55 89,58 94,54 98,56 103,52 108,57 113,54 117,54 121,30 124,55 129,58 134,54 139,55 144,52 148,57 151,53 154,55 157,30 160,55 165,58 170,54 175,56 180,52 185,57 190,54 194,53 197,30 200,55 205,58 210,54 215,56 220,52 225,57 230,54 234,54 237,30 240,55 245,58 250,54 254,56 259,52 264,57 269,54 273,53 278,30 281,55 286,58 291,54 296,55 300,53 305,57 310,54 315,53 318,30 321,55 326,58 331,54 335,56 340,52 345,57 350,54 354,53 358,30 361,55 366,58 371,54 376,55 380,52 385,57 389,54 393,53 396,30 399,55 404,58 409,54 413,56 418,52 423,57 427,54 432,53 436,55 440,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <div class="ecg-note">Sin onda P · Línea base irregular (ondas f) 350–600/min · RR irregularmente irregular · QRS estrecho</div>
+        </div>
+      </div>
+
+      <h2>Ritmos de paro</h2>
+      <div class="ecg-grid2">
+        <!-- FV -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">Fibrilación ventricular (FV)</span><span class="badge b-red">DESFIBRILAR</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <polyline points="5,55 13,35 20,72 28,30 35,68 43,25 51,78 58,40 66,72 74,22 82,82 89,44 95,30 102,68 108,33 115,76 123,27 130,72 137,44 144,34 151,74 158,37 165,68 172,29 179,76 186,42 192,32 198,72 205,47 212,32 219,66 226,40 233,27 240,74 247,50 253,34 260,72 267,44 274,32 281,74 288,47 295,37 302,64 309,28 316,76 323,44 330,34 337,72 344,47 351,32 358,70 365,40 372,79 379,34 386,72 393,44 400,32 407,74 414,48 420,34 427,72 433,46 438,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <div class="ecg-note">Oscilaciones caóticas irregulares · Sin QRS / P / T identificables · Sin línea isoeléctrica · → 200 J bifásico inmediato</div>
+        </div>
+
+        <!-- TVSP -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">TV sin pulso — Monomórfica</span><span class="badge b-red">DESFIBRILAR</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <polyline points="5,55 15,55 17,22 20,82 23,22 27,55 36,55 38,55 46,55 48,22 51,82 54,22 58,55 67,55 69,55 77,55 79,22 82,82 85,22 89,55 98,55 100,55 108,55 110,22 113,82 116,22 120,55 129,55 131,55 139,55 141,22 144,82 147,22 151,55 160,55 162,55 170,55 172,22 175,82 178,22 182,55 191,55 193,55 201,55 203,22 206,82 209,22 213,55 222,55 224,55 232,55 234,22 237,82 240,22 244,55 253,55 255,55 263,55 265,22 268,82 271,22 275,55 284,55 286,55 294,55 296,22 299,82 302,22 306,55 315,55 317,55 325,55 327,22 330,82 333,22 337,55 346,55 348,55 356,55 358,22 361,82 364,22 368,55 377,55 379,55 387,55 389,22 392,82 395,22 399,55 408,55 410,55 418,55 420,22 423,82 426,22 430,55 440,55" fill="none" stroke="#1A6B3A" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+          <div class="ecg-note">QRS anchos &gt;120 ms · Regulares · FC &gt;100 lpm · Sin P identificable · Sin pulso → tratar igual que FV</div>
+        </div>
+
+        <!-- Asistolia -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">Asistolia</span><span class="badge b-amber">RCP + ADRENALINA</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <line x1="5" y1="55" x2="435" y2="55" stroke="#1A6B3A" stroke-width="1.5"/>
+            <text x="140" y="44" fill="#3A6A3A" font-size="9" font-family="monospace" opacity="0.7">— sin actividad eléctrica —</text>
+          </svg>
+          <div class="ecg-note">Línea plana · Confirmar en ≥2 derivadas · Verificar contacto de electrodos y ganancia del monitor</div>
+        </div>
+
+        <!-- AESP -->
+        <div class="ecg-wrap">
+          <div class="ecg-top"><span class="ecg-name">AESP — Actividad eléctrica sin pulso</span><span class="badge b-amber">BUSCAR CAUSA</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <polyline points="5,55 30,55 33,48 37,42 41,48 45,55 50,55 52,32 55,55 60,55 66,50 72,55 96,55 121,55 124,48 128,42 132,48 136,55 141,55 143,32 146,55 151,55 157,50 163,55 187,55 212,55 215,48 219,42 223,48 227,55 232,55 234,32 237,55 242,55 248,50 254,55 278,55 303,55 306,48 310,42 314,48 318,55 323,55 325,32 328,55 333,55 339,50 345,55 369,55 394,55 397,48 401,42 405,48 409,55 414,55 416,32 419,55 424,55 430,50 436,55 440,55" fill="none" stroke="#1A6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+            <text x="5" y="92" fill="#3A6A3A" font-size="8" font-family="monospace">▲ Ritmo organizado visible. NO hay pulso palpable → buscar H y T</text>
+          </svg>
+          <div class="ecg-note">Cualquier ritmo organizado · Ausencia de pulso central · Causa siempre reversible · POCUS si disponible</div>
+        </div>
+
+        <!-- Torsades -->
+        <div class="ecg-wrap" style="grid-column:1/-1">
+          <div class="ecg-top"><span class="ecg-name">Torsades de Pointes — TV polimórfica</span><span class="badge b-purple">Mg²⁺ · NO amiodarona</span></div>
+          <svg class="ecg-svg" viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="440" height="100" fill="#f0f7f0"/>
+            <rect width="440" height="100" fill="url(#g1l)"/>
+            <line x1="5" y1="55" x2="435" y2="55" stroke="#b0ccb0" stroke-width="0.5" stroke-dasharray="4,6"/>
+            <polyline points="5,55 22,55 24,40 27,65 30,40 33,55 47,55 49,32 52,55 57,53 62,55 80,55" fill="none" stroke="rgba(26,107,58,0.6)" stroke-width="1.5" stroke-linejoin="round"/>
+            <polyline points="80,55 84,52 88,38 92,72 96,35 100,75 104,45 108,30 112,68 116,38 120,74 124,48 128,38 132,72 136,46 140,38 144,75 148,52 152,40 156,68 160,52" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="160,52 164,58 168,62 172,65 176,62 180,55 184,47 188,38 192,47 196,55 200,62 204,68 208,74 212,78 216,74 220,66 224,58 228,52 232,56 236,65 240,72 244,76 248,72 252,65 256,56 260,50 264,45 268,40 272,45 276,54 280,60 284,64 288,62 292,56 296,50 300,46 304,41 308,46 312,55 316,60" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <polyline points="316,60 320,56 324,50 328,42 332,35 336,45 340,54 344,60 348,65 352,62 356,57 360,55 370,55 372,32 375,55 380,52 386,55 400,55 402,32 405,55 410,52 416,55 430,55 432,32 435,55 440,55" fill="none" stroke="rgba(26,107,58,0.6)" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <div class="ecg-note">QRS polimórficos que "giran" alrededor del eje · FC 150–250 lpm · Contexto: QTc prolongado · → Sulfato Mg²⁺ 2 g IV + corregir electrolitos + suspender QT-prolongadores</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACLS · CAP 6 -->
+    <div class="chapter" id="acls-c6">
+      <div class="guide-header">
+        <div class="guide-tag">ACLS · Capítulo 06</div>
+        <h1 class="guide-h1">Integración clínica — Casos</h1>
+        <p class="guide-desc">Escenarios de reanimación para integrar los conceptos del módulo ACLS</p>
+      </div>
+      <div class="scenario">
+        <div class="scenario-tag">Caso 01 · FV post-IAM</div>
+        <div class="scenario-title">Masculino 58a · IAM anterior extenso 2 días previos · Sala de hospitalización</div>
+        <p>A las 02:15 h la enfermera activa el código por pérdida de conciencia súbita. Monitor: actividad caótica. Médico llega en 90 segundos.</p>
+        <ol class="step-list">
+          <li><strong>Reconocimiento:</strong> Inconciencia + ausencia de pulso en &lt;10 s. Líder asigna roles en voz alta.</li>
+          <li><strong>RCP inmediata:</strong> Compresor inicia. Monitor coloca parches. Acceso IV en marcha.</li>
+          <li><strong>Análisis ritmo:</strong> "FV — cargando 200 J." Pausa &lt;5 s.</li>
+          <li><strong>Desfibrilación:</strong> 200 J bifásico → RCP inmediata 2 min sin verificar ritmo.</li>
+          <li><strong>Ciclo 2:</strong> Análisis → FV persiste → Choque → Adrenalina 1 mg IV.</li>
+          <li><strong>Ciclo 3:</strong> FV persiste → Choque → Amiodarona 300 mg IV. EtCO₂ 12 mmHg → optimizar compresiones.</li>
+          <li><strong>ROSC:</strong> EtCO₂ sube a 52 mmHg. Pulso carotídeo. → Cuidados post-paro: TTM 36°C, UCI, cateterismo.</li>
+        </ol>
+      </div>
+      <div class="scenario">
+        <div class="scenario-tag">Caso 02 · AESP en embarazo</div>
+        <div class="scenario-title">Femenino 34a · 32 semanas · Disnea súbita en urgencias</div>
+        <p>Monitor: ritmo sinusal a 120 lpm. No hay pulso. AESP. Sospecha de TEP masivo.</p>
+        <ol class="step-list">
+          <li><strong>RCP modificada:</strong> Desplazamiento uterino a la izquierda (cuña 15–30° bajo cadera derecha).</li>
+          <li><strong>POCUS inmediato:</strong> VD dilatado + VI vacío → TEP masivo.</li>
+          <li><strong>Adrenalina + RCP continua.</strong> EtCO₂ bajo → mejorar calidad de compresiones.</li>
+          <li><strong>Trombolisis:</strong> AESP &gt;4 min → Alteplasa 50 mg IV bolo. RCP continua 60–90 min post-trombolisis.</li>
+          <li><strong>Cesárea peri-mortem:</strong> Si no hay ROSC en 4–5 min de RCP óptima.</li>
+          <li><strong>ROSC:</strong> UCI + monitoreo fetal + anticoagulación definitiva.</li>
+        </ol>
+      </div>
+    </div>
+  </div><!-- /g-acls -->
+
+  <!-- ███████████████████████████████████████████████
+       GUÍA 2: ATLS
+  ███████████████████████████████████████████████ -->
+  <div class="guide-page" id="g-atls">
+
+    <div class="chapter active" id="atls-c1">
+      <div class="guide-header">
+        <div class="guide-tag">ATLS · Capítulo 01</div>
+        <h1 class="guide-h1">Primary Survey<br><em style="font-size:0.7em;color:var(--c-text2)">ABCDE del trauma</em></h1>
+        <p class="guide-desc">Evaluación primaria sistemática y simultánea — identificar y tratar amenazas de vida inmediatas</p>
+      </div>
+      <div class="warn-box"><strong>Principio ATLS:</strong> Tratar las amenazas de vida en el orden en que se identifican. No continuar al siguiente paso sin controlar el anterior.</div>
+      <h2>El ABCDE del trauma</h2>
+      <div class="card-grid">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--c-red-l);color:var(--c-red);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:600">A</div>
+            <span style="font-weight:500">Airway — Vía aérea</span>
+          </div>
+          <ul>
+            <li>Habla normal → VA probablemente permeable</li>
+            <li>Inmovilización cervical manual simultánea</li>
+            <li>Maniobra de tracción mandibular (no extensión en trauma)</li>
+            <li>Cánulas orofaríngea/nasofaríngea si inconsciente</li>
+            <li>Intubación orotraqueal (SRI) si GCS ≤8 o vía aérea comprometida</li>
+            <li>Cricotiroidotomía si "no puedo intubar, no puedo oxigenar"</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--c-amber-l);color:var(--c-amber);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:600">B</div>
+            <span style="font-weight:500">Breathing — Ventilación</span>
+          </div>
+          <ul>
+            <li>Exponer tórax. Contar FR, observar simetría</li>
+            <li>Percusión + auscultación bilateral</li>
+            <li><strong>6 amenazas que matan:</strong> neumotórax a tensión, neumotórax abierto, hemotórax masivo, tórax inestable, taponamiento cardíaco, obstrucción VA</li>
+            <li>SpO₂ meta &gt;95%, O₂ suplementario</li>
+            <li>Neumotórax a tensión → descompresión inmediata (no esperar Rx)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--c-red-l);color:var(--c-red);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:600">C</div>
+            <span style="font-weight:500">Circulation — Control hemorrágico</span>
+          </div>
+          <ul>
+            <li>Control directo del sangrado externo (presión directa, torniquete)</li>
+            <li>2 accesos IV periféricos calibre ≥16G (o IO)</li>
+            <li>1 L Ringer lactato en adulto, reevaluar</li>
+            <li>Signos de shock: FC↑, PA↓, relleno capilar &gt;2s, alteración mental</li>
+            <li>"Hipotensión permisiva" en trauma penetrante hasta hemostasia quirúrgica (meta PAS 80–90 mmHg)</li>
+            <li>Fractura de pelvis inestable → cinturón pélvico / sábana</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--c-purple-l);color:var(--c-purple);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:600">D</div>
+            <span style="font-weight:500">Disability — Estado neurológico</span>
+          </div>
+          <ul>
+            <li>GCS (E+V+M): normal 15, paro 3</li>
+            <li>AVPU: Alert / Voice / Pain / Unresponsive</li>
+            <li>Pupilas: tamaño, simetría, reactividad</li>
+            <li>Glucemia capilar (descartar hipoglucemia)</li>
+            <li>GCS ≤8 → intubación definitiva</li>
+            <li>Signos de herniación: Cushing, anisocoria → manitol / SSH</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--c-teal-l);color:var(--c-teal);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:600">E</div>
+            <span style="font-weight:500">Exposure — Exposición</span>
+          </div>
+          <ul>
+            <li>Desvestir completamente al paciente</li>
+            <li>Evaluar cara posterior: "log-roll" con protección cervical</li>
+            <li>Identificar todas las heridas penetrantes</li>
+            <li>Prevenir hipotermia (mantas, fluidos tibios)</li>
+            <li>Temperatura: la hipotermia forma parte de la "tríada de la muerte" en trauma</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Tríada letal del trauma</h2>
+      <div class="three-col">
+        <div class="card" style="text-align:center">
+          <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--c-red)">❄</div>
+          <h3>Hipotermia</h3>
+          <p>T° &lt;35°C. Altera la coagulación, función miocárdica y el metabolismo. Calentar activamente desde el inicio.</p>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--c-amber)">⚖</div>
+          <h3>Acidosis</h3>
+          <p>Hipoperfusión → metabolismo anaeróbico → acidosis láctica. Meta lactato &lt;2 mmol/L como indicador de resucitación.</p>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--c-purple)">🩸</div>
+          <h3>Coagulopatía</h3>
+          <p>Dilución de factores, consumo por hemorragia, hipotermia. Protocolo de transfusión masiva: pRBC:PFC:plaquetas 1:1:1.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter" id="atls-c2">
+      <div class="guide-header">
+        <div class="guide-tag">ATLS · Capítulo 02</div>
+        <h1 class="guide-h1">Secondary Survey</h1>
+        <p class="guide-desc">Evaluación de cabeza a pies — AMPLE, examen físico sistemático y estudios diagnósticos</p>
+      </div>
+      <h2>Historia AMPLE</h2>
+      <div class="card">
+        <table>
+          <thead><tr><th>Letra</th><th>Campo</th><th>Preguntas clave</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="font-size:1.1rem;color:var(--c-accent)">A</strong></td><td>Alergias</td><td>¿Alergia a medicamentos, látex, contrastes?</td></tr>
+            <tr><td><strong style="font-size:1.1rem;color:var(--c-accent)">M</strong></td><td>Medicamentos</td><td>¿Anticoagulantes, antiagregantes, betabloqueadores, insulina?</td></tr>
+            <tr><td><strong style="font-size:1.1rem;color:var(--c-accent)">P</strong></td><td>Patologías previas</td><td>¿Enfermedades crónicas, cirugías previas, embarazo?</td></tr>
+            <tr><td><strong style="font-size:1.1rem;color:var(--c-accent)">L</strong></td><td>Last meal (último alimento)</td><td>¿Cuándo comió por última vez? (importante para intubación)</td></tr>
+            <tr><td><strong style="font-size:1.1rem;color:var(--c-accent)">E</strong></td><td>Evento / Entorno</td><td>Mecanismo de trauma, energía involucrada, cinemática</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Examen físico sistemático</h2>
+      <div class="card-grid">
+        <div class="card"><h4>Cabeza y cara</h4><ul><li>Heridas del cuero cabelludo (hemorragia importante)</li><li>Fracturas craneales (hematoma periorbitario, signo de Battle)</li><li>Hemotímpano, otorragia, rinorragia de LCR</li><li>Estabilidad de macizo facial</li></ul></div>
+        <div class="card"><h4>Cuello</h4><ul><li>Ingurgitación venosa yugular (taponamiento/neumotórax tensión)</li><li>Desviación traqueal</li><li>Hematoma expansivo</li><li>Enfisema subcutáneo</li><li>Dolor a la palpación de la columna cervical</li></ul></div>
+        <div class="card"><h4>Tórax</h4><ul><li>Heridas abiertas ("succionantes")</li><li>Tórax inestable: segmento costal flotante, movimiento paradójico</li><li>Contusión pulmonar / miocárdica</li><li>Rx tórax portátil vs TC de tórax</li></ul></div>
+        <div class="card"><h4>Abdomen y pelvis</h4><ul><li>Abdomen en tabla, distensión, equimosis (sign. del cinturón)</li><li>FAST: fluido libre perihepático, periesplénico, pericárdico, pélvico</li><li>Pelvis: compresión y distracción (una sola vez)</li><li>Indicación de laparotomía de emergencia</li></ul></div>
+        <div class="card"><h4>Extremidades</h4><ul><li>Fracturas abiertas y cerradas</li><li>Pulsos distales, perfusión</li><li>Síndrome compartimental (dolor a la extensión pasiva)</li><li>Lesiones vasculares (lesión dura/blanda)</li></ul></div>
+        <div class="card"><h4>Neurológico</h4><ul><li>GCS completo</li><li>Fuerza motora de las 4 extremidades</li><li>Sensibilidad</li><li>Reflejos tendinosos</li><li>Nivel sensitivo en trauma de columna</li></ul></div>
+      </div>
+    </div>
+
+    <div class="chapter" id="atls-c3">
+      <div class="guide-header">
+        <div class="guide-tag">ATLS · Capítulo 03</div>
+        <h1 class="guide-h1">Shock en el trauma</h1>
+        <p class="guide-desc">Clasificación, fisiopatología y manejo del shock hemorrágico</p>
+      </div>
+      <h2>Clasificación del shock hemorrágico (ATLS)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Clase</th><th>Pérdida (mL)</th><th>% Volemia</th><th>FC</th><th>PAS</th><th>FR</th><th>Diuresis mL/h</th><th>Estado mental</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Clase I</strong></td><td>&lt;750</td><td>&lt;15%</td><td>&lt;100</td><td>Normal</td><td>14–20</td><td>&gt;30</td><td>Ligeramente ansioso</td></tr>
+            <tr><td><strong>Clase II</strong></td><td>750–1500</td><td>15–30%</td><td>100–120</td><td>Normal</td><td>20–30</td><td>20–30</td><td>Moderadamente ansioso</td></tr>
+            <tr><td><strong>Clase III</strong> <span class="badge b-amber">Transfusión</span></td><td>1500–2000</td><td>30–40%</td><td>120–140</td><td>↓</td><td>30–40</td><td>5–15</td><td>Confuso, ansioso</td></tr>
+            <tr><td><strong>Clase IV</strong> <span class="badge b-red">Cirugía urgente</span></td><td>&gt;2000</td><td>&gt;40%</td><td>&gt;140</td><td>↓↓</td><td>&gt;35</td><td>Mínima / anuria</td><td>Confuso, letárgico</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Control del daño — Damage Control Resuscitation</h2>
+      <ol class="step-list">
+        <li><strong>Hemostasia quirúrgica precoz:</strong> control del sangrado en OR antes que la resucitación agresiva. "Stop the bleeding first."</li>
+        <li><strong>Hipotensión permisiva:</strong> PAS objetivo 80–90 mmHg en trauma penetrante sin TCE hasta hemostasia. En TCE: PAS ≥ 90 mmHg.</li>
+        <li><strong>Protocolo de transfusión masiva (PTM):</strong> Concentrado de hematíes : PFC : Plaquetas = 1:1:1. Activar con >10 unidades en 24h o hemorragia masiva activa.</li>
+        <li><strong>Ácido tranexámico (TXA):</strong> 1 g IV en 10 min (primeras 3h del trauma) → 1 g en 8h. Reduce mortalidad por hemorragia (CRASH-2).</li>
+        <li><strong>Calcio:</strong> Gluconato Ca²⁺ 1 g IV por cada 4 unidades de hemoderivados transfundidos (el citrato de los hemoderivados quela el Ca²⁺).</li>
+        <li><strong>Evitar la tríada letal:</strong> fluidos tibios, mantas de calentamiento, corrección de coagulopatía.</li>
+      </ol>
+    </div>
+
+    <div class="chapter" id="atls-c4">
+      <div class="guide-header">
+        <div class="guide-tag">ATLS · Capítulo 04</div>
+        <h1 class="guide-h1">Trauma torácico</h1>
+        <p class="guide-desc">Las 6 lesiones que matan inmediatamente y las 6 que pueden matar</p>
+      </div>
+      <h2>Lesiones que matan inmediatamente</h2>
+      <div class="card-grid">
+        <div class="card"><h4 style="color:var(--c-red)">1. Neumotórax a tensión</h4><p><strong>Mecanismo:</strong> mecanismo valvular → acumulación de aire → desviación mediastínica → ↓retorno venoso → paro.</p><p><strong>Clínica:</strong> disnea, hipotensión, ingurgitación yugular, tráquea desviada, ausencia de murmullo en lado afectado.</p><p><strong>Tx:</strong> No esperar Rx. Descompresión con aguja 14G en 2° EIC línea medioclavicular → pleurostomía definitiva.</p></div>
+        <div class="card"><h4 style="color:var(--c-red)">2. Neumotórax abierto</h4><p><strong>Mecanismo:</strong> defecto de la pared torácica &gt;2/3 del diámetro traqueal → ventilación preferencial por el defecto.</p><p><strong>Tx:</strong> Parche oclusivo de 3 lados (valva) → pleurostomía en sitio diferente al defecto.</p></div>
+        <div class="card"><h4 style="color:var(--c-red)">3. Hemotórax masivo</h4><p>&gt;1500 mL de sangre o &gt;200 mL/h por el tubo torácico. Hipovolemia + colapso pulmonar.</p><p><strong>Tx:</strong> 2 accesos IV gruesos + pleurostomía 5° EIC + transfusión. Toracotomía si &gt;1500 mL inicial o &gt;200 mL/h persistente.</p></div>
+        <div class="card"><h4 style="color:var(--c-red)">4. Tórax inestable</h4><p>≥2 fracturas en ≥2 costillas adyacentes → segmento flotante con movimiento paradójico. Contusión pulmonar subyacente es la verdadera amenaza.</p><p><strong>Tx:</strong> Analgesia óptima + O₂. CPAP/VNI. Intubación si IOT ≥2 criterios.</p></div>
+        <div class="card"><h4 style="color:var(--c-red)">5. Taponamiento cardíaco</h4><p><strong>Tríada de Beck:</strong> hipotensión, ingurgitación yugular, ruidos cardíacos velados. FAST muestra fluido pericárdico.</p><p><strong>Tx:</strong> Pericardiocentesis subxifoidea como puente → pericardiotomía quirúrgica definitiva.</p></div>
+        <div class="card"><h4 style="color:var(--c-red)">6. Obstrucción VA</h4><p>Edema, sangre, vómito, dientes. Stridor, uso de músculos accesorios, cianosis.</p><p><strong>Tx:</strong> Maniobra de tracción mandibular → aspiración → SRI → cricotiroidotomía si falla.</p></div>
+      </div>
+    </div>
+
+    <div class="chapter" id="atls-c5">
+      <div class="guide-header">
+        <div class="guide-tag">ATLS · Capítulo 05</div>
+        <h1 class="guide-h1">TCE y lesión de columna</h1>
+      </div>
+      <h2>Clasificación del TCE por GCS</h2>
+      <div class="three-col">
+        <div class="card" style="border-top:3px solid var(--c-green)"><h4 style="color:var(--c-green)">TCE Leve</h4><p>GCS 14–15. TC si criterios Canadian CT Head Rule. Alta con instrucciones.</p></div>
+        <div class="card" style="border-top:3px solid var(--c-amber)"><h4 style="color:var(--c-amber)">TCE Moderado</h4><p>GCS 9–13. TC craneal obligatoria. Hospitalización para observación. IOT si deterioro.</p></div>
+        <div class="card" style="border-top:3px solid var(--c-red)"><h4 style="color:var(--c-red)">TCE Grave</h4><p>GCS ≤8. IOT inmediata. TC. Ingreso UCI. Monitoreo de PIC si indicado.</p></div>
+      </div>
+      <h2>Manejo del TCE grave</h2>
+      <ol class="step-list">
+        <li><strong>IOT:</strong> RSI con inmovilización cervical manual. Etomidato + Rocuronio. Evitar Succinilcolina si ↑K⁺ conocido.</li>
+        <li><strong>Objetivos hemodinámicos:</strong> PAS ≥90 mmHg (hipotensión duplica mortalidad). PaO₂ &gt;60 mmHg. PaCO₂ 35–40 mmHg (evitar hiper/hipocapnia).</li>
+        <li><strong>Hipertensión intracraneal (signos de herniación):</strong> Manitol 1 g/kg IV o SSH 3% 250 mL. Hiperventilación temporal (PaCO₂ 30–35 mmHg) como puente.</li>
+        <li><strong>Control de convulsiones:</strong> Levetiracetam 20 mg/kg IV o Fenitoína 20 mg/kg IV. Profilaxis 7 días en TCE grave.</li>
+        <li><strong>Cabecera 30°,</strong> temperatura normotérmica, glucemia 140–180 mg/dL.</li>
+      </ol>
+    </div>
+
+    <div class="chapter" id="atls-c6">
+      <div class="guide-header">
+        <div class="guide-tag">ATLS · Capítulo 06</div>
+        <h1 class="guide-h1">Trauma abdominal</h1>
+      </div>
+      <h2>FAST — Focused Assessment with Sonography in Trauma</h2>
+      <div class="card-grid">
+        <div class="card"><h4>Ventana pericárdica</h4><p>Subcostal o paraesternal. Detecta hemopericardio/taponamiento. &gt;20 mL de fluido = positivo.</p></div>
+        <div class="card"><h4>Cuadrante superior derecho</h4><p>Espacio hepatorrenal (Morrison). La más sensible para hemoperitoneo libre.</p></div>
+        <div class="card"><h4>Cuadrante superior izquierdo</h4><p>Espacio esplenorrenal. Evalúa esplenomegalia y sangrado esplénico.</p></div>
+        <div class="card"><h4>Suprapúbico / Pélvico</h4><p>Fondo de saco de Douglas. Fluido libre en trauma abdominal / pélvico.</p></div>
+      </div>
+      <h2>Indicaciones de laparotomía de emergencia</h2>
+      <ul>
+        <li>Abdomen en tabla con inestabilidad hemodinámica</li>
+        <li>FAST positivo con inestabilidad hemodinámica</li>
+        <li>Evisceracion o evisceración</li>
+        <li>Lesión penetrante con signos peritoneales</li>
+        <li>&gt;1500 mL en lavado peritoneal diagnóstico (LPD)</li>
+        <li>Evidencia de lesión de víscera hueca en TC</li>
+      </ul>
+    </div>
+  </div><!-- /g-atls -->
+
+  <!-- ███████████████████████████████████████████████
+       GUÍA 3: TOXIDROMES
+  ███████████████████████████████████████████████ -->
+  <div class="guide-page" id="g-tox">
+    <div class="chapter active" id="tox-c1">
+      <div class="guide-header">
+        <div class="guide-tag">Toxidromes · Capítulo 01</div>
+        <h1 class="guide-h1">Reconocimiento del toxidrome</h1>
+        <p class="guide-desc">Identificación clínica rápida del síndrome toxicológico para guiar el tratamiento antes de conocer el tóxico exacto</p>
+      </div>
+      <div class="info-box"><strong>Principio fundamental:</strong> El toxidrome se reconoce por la constelación de signos vitales + estado mental + signos autonómicos + síntomas musculares — no por la historia del paciente.</div>
+      <h2>Tabla comparativa de toxidromes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Toxidrome</th><th>FC</th><th>PA</th><th>FR</th><th>T°</th><th>Pupilas</th><th>Piel</th><th>Peristaltismo</th><th>Estado mental</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Simpaticomimético</strong></td><td>↑↑</td><td>↑↑</td><td>↑</td><td>↑</td><td>Midriasis</td><td>Diaforética</td><td>↑</td><td>Agitado, psicosis</td></tr>
+            <tr><td><strong>Colinérgico (muscarínico)</strong></td><td>↓</td><td>↓</td><td>↑</td><td>N</td><td>Miosis</td><td>Diaforética</td><td>↑↑</td><td>Confuso, obnubilado</td></tr>
+            <tr><td><strong>Anticolinérgico</strong></td><td>↑</td><td>↑ o N</td><td>↑</td><td>↑↑</td><td>Midriasis</td><td>Seca, rubicunda</td><td>↓↓</td><td>Agitado, alucinaciones</td></tr>
+            <tr><td><strong>Opiáceo</strong></td><td>↓</td><td>↓</td><td>↓↓</td><td>↓</td><td>Miosis puntiforme</td><td>Fría, cianótica</td><td>↓</td><td>Sedado, coma</td></tr>
+            <tr><td><strong>Sedante/hipnótico</strong></td><td>↓ o N</td><td>↓ o N</td><td>↓</td><td>↓ o N</td><td>Normal o midriasis leve</td><td>Normal</td><td>↓</td><td>Sedado, ataxia, slurred speech</td></tr>
+            <tr><td><strong>Serotonérgico</strong></td><td>↑↑</td><td>↑</td><td>↑</td><td>↑↑↑</td><td>Midriasis</td><td>Diaforética</td><td>↑</td><td>Agitado · Clonus · Hiperreflexia</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="key-box"><strong>Truco mnemotécnico anticolinérgico:</strong> "Blind as a bat · Mad as a hatter · Red as a beet · Hot as a hare · Dry as a bone · Bowel and bladder lose their tone." (ciego, loco, rojo, caliente, seco, retención urinaria e íleo).</div>
+    </div>
+
+    <div class="chapter" id="tox-c2">
+      <div class="guide-header">
+        <div class="guide-tag">Toxidromes · Capítulo 02</div>
+        <h1 class="guide-h1">Toxidrome simpaticomimético</h1>
+      </div>
+      <h2>Agentes causales</h2>
+      <div class="two-col">
+        <div class="card"><h4>Estimulantes clásicos</h4><ul><li>Cocaína (bloquea recaptura NA/DA + anestésico local)</li><li>Anfetaminas y metanfetamina</li><li>MDMA ("éxtasis") — combina simpaticomimético + serotonérgico</li><li>Cafeína, efedrina, pseudoefedrina</li></ul></div>
+        <div class="card"><h4>Otros agentes</h4><ul><li>Descongestionantes nasales (oximetazolina — efecto α)</li><li>Broncodilatadores en sobredosis</li><li>Metilfenidato (Ritalin)</li><li>Sales de baño (MDPV, catinona sintética)</li></ul></div>
+      </div>
+      <h2>Complicaciones principales</h2>
+      <div class="card-grid">
+        <div class="card"><h4 style="color:var(--c-red)">Cardiovasculares</h4><ul><li>Hipertensión severa / urgencia hipertensiva</li><li>Vasoespasmo coronario → IAMCEST sin aterosclerosis</li><li>Arritmias (FV, TVSP)</li><li>Disección aórtica</li></ul></div>
+        <div class="card"><h4 style="color:var(--c-amber)">Neurológicas</h4><ul><li>Agitación extrema / psicosis aguda</li><li>Convulsiones (especialmente cocaína)</li><li>ACV isquémico o hemorrágico</li><li>Hipertermia severa (&gt;40°C)</li></ul></div>
+      </div>
+      <h2>Manejo</h2>
+      <ol class="step-list">
+        <li><strong>Benzodiacepinas:</strong> piedra angular del tratamiento. Diazepam 5–10 mg IV o Lorazepam 2–4 mg IV. Repetir hasta sedación. Controlan agitación, convulsiones, hipertensión y taquicardia.</li>
+        <li><strong>Hipertermia:</strong> enfriar activamente (baño de hielo, ventiladores). Es la principal causa de muerte. Meta T° &lt;38.5°C.</li>
+        <li><strong>Hipertensión refractaria:</strong> Nitroprusato o Nicardipino IV. Evitar betabloqueadores puros (riesgo de vasoconstricción paradójica por efecto α sin oposición).</li>
+        <li><strong>Convulsiones:</strong> BDZ primera línea → Fenobarbital si refractarias. Evitar fenitoína (ineficaz en convulsiones tóxicas).</li>
+        <li><strong>IAMCEST por cocaína:</strong> NTG + AAS + BDZ. Trombolíticos contraindicados en disección aórtica (descartar). Cateterismo si hay duda.</li>
+      </ol>
+    </div>
+
+    <div class="chapter" id="tox-c3">
+      <div class="guide-header">
+        <div class="guide-tag">Toxidromes · Capítulo 03</div>
+        <h1 class="guide-h1">Toxidrome colinérgico y anticolinérgico</h1>
+      </div>
+      <h2>Toxidrome colinérgico</h2>
+      <div class="warn-box"><strong>Agentes organofosforados y carbamatos:</strong> inhibidores irreversibles de la acetilcolinesterasa. Exposición agrícola, ataques químicos (sarín, tabún, VX).</div>
+      <h3>Mnemotécnico SLUDGE / DUMBELS</h3>
+      <div class="two-col">
+        <div class="card">
+          <h4>SLUDGE — efectos muscarínicos</h4>
+          <ul>
+            <li><strong>S</strong>alivación excesiva</li>
+            <li><strong>L</strong>acrimación</li>
+            <li><strong>U</strong>rinación (incontinencia urinaria)</li>
+            <li><strong>D</strong>efecación, diarrea</li>
+            <li><strong>G</strong>astroenteric distress (dolor abdominal)</li>
+            <li><strong>E</strong>mesis</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Efectos nicotínicos (musculares)</h4>
+          <ul>
+            <li>Fasciculaciones musculares</li>
+            <li>Debilidad muscular → parálisis</li>
+            <li>Parálisis diafragmática → <strong>insuficiencia respiratoria</strong></li>
+            <li>Taquicardia (efecto nicotínico supera el muscarínico)</li>
+            <li>La principal causa de muerte es la <strong>insuficiencia respiratoria</strong></li>
+          </ul>
+        </div>
+      </div>
+      <h3>Tratamiento</h3>
+      <ol class="step-list">
+        <li><strong>Atropina:</strong> 2–4 mg IV inicial → doblar la dosis c/5 min hasta "punto de atropinización" (secreciones secas, broncoespasmo resuelto). Pueden necesitarse &gt;100 mg en intoxicaciones severas. Meta: secreciones secas, no FC.</li>
+        <li><strong>Pralidoxima (2-PAM):</strong> 1–2 g IV en 15–30 min → 500 mg/h infusión. Reactiva la colinesterasa. Eficaz si se administra antes de "envejecimiento" de la unión enzimática (&lt;24h en organofosforados).</li>
+        <li><strong>Descontaminación:</strong> quitar ropa, lavar con agua y jabón abundante. Protección del personal (guantes, bata).</li>
+        <li><strong>Intubación:</strong> parálisis diafragmática → IOT + VM. Usar Rocuronio (succinilcolina prolonga parálisis por inhibición de colinesterasa plasmática).</li>
+        <li><strong>Benzodiacepinas</strong> para convulsiones: Diazepam 5–10 mg IV.</li>
+      </ol>
+
+      <h2>Toxidrome anticolinérgico</h2>
+      <div class="card-grid">
+        <div class="card"><h4>Agentes comunes</h4><ul><li>Difenhidramina (antihistamínico H1)</li><li>Escopolamina, atropina en sobredosis</li><li>Antidepresivos tricíclicos (ATC)</li><li>Antipsicóticos típicos (clorpromazina)</li><li>Plantas: estramonio (Datura), beladona</li></ul></div>
+        <div class="card"><h4>Complicaciones temidas</h4><ul><li>Hipertermia severa (ausencia de sudoración)</li><li>Rabdomiolisis por agitación + hipertermia</li><li>Arritmias (sobre todo ATC → bloqueo Na⁺ → QRS ancho → FV)</li><li>Retención urinaria aguda, íleo paralítico</li></ul></div>
+      </div>
+      <h3>Tratamiento</h3>
+      <ol class="step-list">
+        <li><strong>Fisostigmina:</strong> 1–2 mg IV lento (antídoto específico). Reversible, cruza BHE. <strong>CI en sobredosis de ATC</strong> (riesgo de convulsiones y bradicardia severa).</li>
+        <li><strong>BDZ</strong> para agitación y convulsiones.</li>
+        <li><strong>Bicarbonato</strong> 1–2 mEq/kg IV si QRS &gt;120 ms por sobredosis de ATC (meta pH 7.45–7.55).</li>
+        <li><strong>Enfriamiento activo</strong> por hipertermia. Hidratación IV.</li>
+        <li>Catéter vesical si retención urinaria.</li>
+      </ol>
+    </div>
+
+    <div class="chapter" id="tox-c4">
+      <div class="guide-header">
+        <div class="guide-tag">Toxidromes · Capítulo 04</div>
+        <h1 class="guide-h1">Opiáceos y sedantes hipnóticos</h1>
+      </div>
+      <h2>Toxidrome opiáceo</h2>
+      <div class="warn-box"><strong>Tríada clásica:</strong> miosis puntiforme + depresión respiratoria + depresión del sensorio. Reversible con naloxona.</div>
+      <div class="two-col">
+        <div class="card"><h4>Agentes frecuentes</h4><ul><li>Morfina, codeína, heroína</li><li>Oxicodona, hidrocodona (Percocet, Vicodin)</li><li>Fentanilo (parches, intravenoso) — potencia 100x morfina</li><li>Metadona — semivida muy larga (&gt;24h), QT prolongación</li><li>Tramadol — también convulsiona (atípico)</li></ul></div>
+        <div class="card"><h4>Tratamiento — Naloxona</h4><ul><li><strong>Dosis:</strong> 0.4–2 mg IV/IM/IN/SC c/2–3 min hasta respuesta</li><li>Fentanilo y heroína: dosis habituales efectivas</li><li>Metadona: dosis mayores, semivida larga → infusión continua (2/3 de la dosis de respuesta/hora)</li><li><strong>Duración:</strong> 30–90 min (más corta que los opioides) → riesgo de re-sedación</li><li>Titular para evitar síndrome de abstinencia agudo</li></ul></div>
+      </div>
+
+      <h2>Benzodiacepinas y sedantes</h2>
+      <div class="card">
+        <p>Sin antídoto universal efectivo en la práctica (flumazenil tiene t½ corta, riesgo de convulsiones en dependencia crónica). Manejo principalmente de soporte.</p>
+        <h4>Principios del manejo</h4>
+        <ol style="padding-left:1.25rem;font-size:0.88rem;color:var(--c-text2)">
+          <li>Soporte respiratorio: cánula nasal de alto flujo, CPAP/BiPAP, intubación si necesario</li>
+          <li>Flumazenil 0.2 mg IV c/1 min (máx 1 mg): solo si NO hay dependencia crónica, NO hay antecedentes de epilepsia, y BDZ es el único agente</li>
+          <li>Monitoreo continuo: riesgo de broncoaspiración</li>
+          <li>GHB, barbitúricos: manejo de soporte exclusivo</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="chapter" id="tox-c5">
+      <div class="guide-header">
+        <div class="guide-tag">Toxidromes · Capítulo 05</div>
+        <h1 class="guide-h1">Antídotos clave</h1>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tóxico</th><th>Antídoto</th><th>Dosis</th><th>Mecanismo</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Opiáceos</strong></td><td>Naloxona</td><td>0.4–2 mg IV/IM/IN c/2–3 min</td><td>Antagonista μ, κ, δ competitivo</td><td>T½ 30–90 min → vigilar re-sedación</td></tr>
+            <tr><td><strong>Benzodiacepinas</strong></td><td>Flumazenil</td><td>0.2 mg IV c/1 min (máx 1 mg)</td><td>Antagonista GABA-A competitivo</td><td>CI en epiléptico o dependiente crónico de BDZ</td></tr>
+            <tr><td><strong>Organofosforados</strong></td><td>Atropina + Pralidoxima</td><td>Atropina 2–4 mg IV (repetir). 2-PAM 1–2 g IV</td><td>Antagonismo muscarínico + reactivación colinesterasa</td><td>Doblar atropina c/5 min hasta punto de atropinización</td></tr>
+            <tr><td><strong>Paracetamol</strong></td><td>N-acetilcisteína (NAC)</td><td>150 mg/kg IV en 1h → 50 mg/kg en 4h → 100 mg/kg en 16h</td><td>Repone glutatión hepático</td><td>Eficaz hasta 24h post-ingesta. Nomograma de Rumack-Matthew</td></tr>
+            <tr><td><strong>Digoxina</strong></td><td>Anticuerpos Fab (Digibind)</td><td>Cálculas según dosis ingerida o nivel sérico</td><td>Neutralización directa</td><td>Indicado en arritmias letales o K⁺ &gt;5.5 mEq/L</td></tr>
+            <tr><td><strong>Warfarina/ACO</strong></td><td>Vitamina K + PFC / CCP</td><td>Vitamina K 10 mg IV lento. CCP (Octaplex) según INR</td><td>Repone factores dependientes vitamina K</td><td>CCP de elección en hemorragia activa</td></tr>
+            <tr><td><strong>Heparina</strong></td><td>Protamina</td><td>1 mg por cada 100 UI de heparina administrada</td><td>Neutralización iónica</td><td>Administrar lentamente (riesgo de hipotensión)</td></tr>
+            <tr><td><strong>Metanol / Etilenglicol</strong></td><td>Fomepizol (4-MP)</td><td>15 mg/kg IV → 10 mg/kg c/12h</td><td>Inhibe alcohol deshidrogenasa</td><td>Diálisis si acidosis severa o insuficiencia renal</td></tr>
+            <tr><td><strong>Betabloqueadores</strong></td><td>Glucagón + Insulina-glucosa alta dosis</td><td>Glucagón 5–10 mg IV. Insulina 1 UI/kg/h + Glucosa</td><td>↑ AMPc (glucagón). ↑inotropia (insulina)</td><td>Emulsión lipídica IV si falla todo lo anterior</td></tr>
+            <tr><td><strong>Cianuro</strong></td><td>Hidroxocobalamina (Cyanokit)</td><td>5 g IV en 15 min</td><td>Se une al CN libre formando cianocobalamina</td><td>Primera línea. Coloración roja de orina y piel (benigno)</td></tr>
+            <tr><td><strong>CO (monóxido carbono)</strong></td><td>O₂ 100% normo o hiperbárico</td><td>FiO₂ 1.0 hasta CO-Hb &lt;5%</td><td>Desplaza CO de la hemoglobina</td><td>OHB si: pérdida de consciencia, CO-Hb &gt;25%, embarazo, cardiopatía</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /g-tox -->
+
+  <!-- ███████████████████████████████████████████████
+       GUÍA 4: SRI / VÍA AÉREA
+  ███████████████████████████████████████████████ -->
+  <div class="guide-page" id="g-sri">
+    <div class="chapter active" id="sri-c1">
+      <div class="guide-header">
+        <div class="guide-tag">Vía Aérea · Capítulo 01</div>
+        <h1 class="guide-h1">Anatomía de la vía aérea superior</h1>
+        <p class="guide-desc">Estructuras anatómicas clave para la laringoscopia y el manejo de la vía aérea</p>
+      </div>
+
+      <!-- Diagrama anatómico SVG -->
+      <div class="anatomy-wrap">
+        <h4>Sección sagital — Vía aérea superior</h4>
+        <svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg" font-family="'DM Mono',monospace" font-size="10">
+          <!-- Perfil de cabeza simplificado -->
+          <path d="M120,20 Q200,10 260,30 Q310,50 320,100 Q330,150 310,180 Q300,200 290,210" fill="none" stroke="#D0CEC7" stroke-width="1.5"/>
+          <!-- Cráneo posterior -->
+          <path d="M120,20 Q80,40 70,90 Q65,140 80,180 Q95,210 120,230" fill="none" stroke="#D0CEC7" stroke-width="1.5"/>
+
+          <!-- Nariz -->
+          <ellipse cx="295" cy="115" rx="22" ry="12" fill="#EEE" stroke="#C0B8B0" stroke-width="1"/>
+          <text x="322" y="119" fill="var(--c-text3)" font-size="9">Fosa nasal</text>
+
+          <!-- Cavidad oral - paladar -->
+          <path d="M180,150 Q230,140 280,155 Q290,160 290,170" fill="none" stroke="#C0B8B0" stroke-width="1.5"/>
+          <text x="190" y="138" fill="var(--c-text3)" font-size="9">Paladar duro/blando</text>
+
+          <!-- Lengua -->
+          <path d="M130,185 Q190,175 240,190 Q270,200 265,225 Q240,245 200,250 Q165,248 150,235 Q130,220 130,200 Z" fill="#FDDCDC" stroke="#C09090" stroke-width="1"/>
+          <text x="170" y="215" fill="var(--c-red)" font-size="9" text-anchor="middle">Lengua</text>
+
+          <!-- Úvula -->
+          <ellipse cx="262" cy="175" rx="8" ry="12" fill="#F0D0D0" stroke="#C09090" stroke-width="1"/>
+
+          <!-- Epiglotis -->
+          <path d="M195,270 Q210,255 225,268 Q230,280 215,290 Q200,295 195,280 Z" fill="#DDEEDD" stroke="#779977" stroke-width="1.5"/>
+          <text x="235" y="275" fill="var(--c-green)" font-size="9">Epiglotis</text>
+          <line x1="233" y1="272" x2="220" y2="278" stroke="var(--c-green)" stroke-width="0.5"/>
+
+          <!-- Valléculas -->
+          <path d="M175,265 Q185,258 195,265" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+          <text x="120" y="258" fill="var(--c-text3)" font-size="9">Vallécula</text>
+          <line x1="170" y1="256" x2="182" y2="262" stroke="var(--c-text3)" stroke-width="0.5"/>
+
+          <!-- Cuerdas vocales -->
+          <path d="M190,305 Q205,298 222,305" fill="none" stroke="var(--c-accent)" stroke-width="2.5"/>
+          <path d="M190,312 Q205,320 222,312" fill="none" stroke="var(--c-accent)" stroke-width="2.5"/>
+          <text x="235" y="310" fill="var(--c-accent)" font-size="9">Cuerdas vocales</text>
+
+          <!-- Tráquea -->
+          <rect x="192" y="320" width="32" height="45" rx="4" fill="none" stroke="#779999" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="232" y="345" fill="var(--c-teal)" font-size="9">Tráquea</text>
+
+          <!-- Cricoides -->
+          <rect x="190" y="315" width="36" height="8" rx="2" fill="#E0EEF0" stroke="#779999" stroke-width="1.5"/>
+          <text x="232" y="322" fill="var(--c-teal)" font-size="9">Cartílago cricoides</text>
+
+          <!-- Membrana cricotiroidea -->
+          <rect x="190" y="296" width="36" height="10" rx="1" fill="#FFF3CD" stroke="#B8860B" stroke-width="1.5"/>
+          <text x="232" y="304" fill="var(--c-amber)" font-size="9">Membrana cricotiroidea ←</text>
+
+          <!-- Tiroides -->
+          <path d="M188,275 Q186,280 186,295 Q188,300 190,296" fill="none" stroke="#C0B080" stroke-width="1.5"/>
+          <path d="M228,275 Q230,280 230,295 Q228,300 226,296" fill="none" stroke="#C0B080" stroke-width="1.5"/>
+          <text x="100" y="290" fill="var(--c-amber)" font-size="9">Cartílago</text>
+          <text x="100" y="300" fill="var(--c-amber)" font-size="9">tiroides</text>
+          <line x1="185" y1="297" x2="142" y2="295" stroke="var(--c-amber)" stroke-width="0.5"/>
+
+          <!-- Esófago -->
+          <rect x="148" y="320" width="28" height="45" rx="4" fill="#F8EEE8" stroke="#C0A080" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="78" y="350" fill="var(--c-text3)" font-size="9">Esófago</text>
+          <line x1="147" y1="348" x2="125" y2="348" stroke="var(--c-text3)" stroke-width="0.5"/>
+
+          <!-- Faringe regions -->
+          <text x="78" y="175" fill="var(--c-text3)" font-size="9">Nasofaringe</text>
+          <text x="78" y="225" fill="var(--c-text3)" font-size="9">Orofaringe</text>
+          <text x="78" y="285" fill="var(--c-text3)" font-size="9">Hipofaringe</text>
+
+          <!-- Líneas guía -->
+          <line x1="125" y1="174" x2="155" y2="174" stroke="var(--c-border2)" stroke-width="0.5"/>
+          <line x1="125" y1="224" x2="155" y2="210" stroke="var(--c-border2)" stroke-width="0.5"/>
+          <line x1="125" y1="283" x2="155" y2="263" stroke="var(--c-border2)" stroke-width="0.5"/>
+
+          <!-- Posición laringoscopio -->
+          <path d="M300,370 L280,330 Q275,310 278,295 Q282,285 290,282 L300,280" fill="none" stroke="var(--c-purple)" stroke-width="2"/>
+          <text x="308" y="340" fill="var(--c-purple)" font-size="9">Hoja laringoscopio</text>
+          <text x="308" y="350" fill="var(--c-purple)" font-size="9">(Mac en vallécula)</text>
+
+          <!-- Angulo de visión -->
+          <path d="M380,20 L290,210 L380,220" fill="none" stroke="rgba(44,74,140,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="385" y="130" fill="var(--c-accent)" font-size="9" text-anchor="start">Eje de</text>
+          <text x="385" y="141" fill="var(--c-accent)" font-size="9">visión</text>
+        </svg>
+        <p style="font-size:0.78rem;color:var(--c-text3);margin-top:8px;text-align:center">La hoja Mac se posiciona en la vallécula (entre la base de la lengua y la epiglotis). La hoja Miller pasa por debajo de la epiglotis y la eleva directamente.</p>
+      </div>
+
+      <h2>Puntos anatómicos clave para la intubación</h2>
+      <div class="card-grid">
+        <div class="card"><h4>Vallécula</h4><p>Espacio entre la base de la lengua y la cara anterior de la epiglotis. La hoja Mac del laringoscopio se introduce aquí. La presión en el ligamento glosoepiglótico eleva la epiglotis indirectamente.</p></div>
+        <div class="card"><h4>Epiglotis</h4><p>Estructura cartilaginosa que protege las cuerdas vocales durante la deglución. Referencia anatómica fundamental en laringoscopia. La hoja Miller la levanta directamente.</p></div>
+        <div class="card"><h4>Cuerdas vocales</h4><p>El tubo endotraqueal debe pasar <strong>bajo visión directa</strong> a través de las cuerdas vocales. El neumotaponador debe quedar 2–3 cm por debajo de las cuerdas.</p></div>
+        <div class="card"><h4>Membrana cricotiroidea</h4><p>Ubicada entre el cartílago tiroides y el cricoides en la línea media. Es el sitio de acceso para cricotiroidotomía de emergencia. Se palpa como una depresión en la línea media del cuello.</p></div>
+      </div>
+
+      <h2>Predictores de vía aérea difícil — LEMON</h2>
+      <div class="card">
+        <table>
+          <thead><tr><th>Letra</th><th>Evaluación</th><th>Criterio de dificultad</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:var(--c-accent)">L</strong></td><td>Look externally (aspecto externo)</td><td>Obesidad, barba, trauma facial, cuello corto, macroglosia</td></tr>
+            <tr><td><strong style="color:var(--c-accent)">E</strong></td><td>Evaluate 3-3-2</td><td>Apertura oral &lt;3 dedos · Distancia mentón-hioides &lt;3 dedos · Distancia hioides-tiroides &lt;2 dedos</td></tr>
+            <tr><td><strong style="color:var(--c-accent)">M</strong></td><td>Mallampati</td><td>Clase III o IV (no se ve la úvula o solo el paladar duro)</td></tr>
+            <tr><td><strong style="color:var(--c-accent)">O</strong></td><td>Obstruction (obstrucción)</td><td>Epiglotitis, absceso periamigdalino, angioedema, cuerpo extraño</td></tr>
+            <tr><td><strong style="color:var(--c-accent)">N</strong></td><td>Neck mobility</td><td>Artritis, collar cervical, espondilosis, obesidad cervical</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chapter" id="sri-c2">
+      <div class="guide-header">
+        <div class="guide-tag">Vía Aérea · Capítulo 02</div>
+        <h1 class="guide-h1">Los 7 pasos de la SRI</h1>
+        <p class="guide-desc">Secuencia de intubación de secuencia rápida — protocolo sistemático para la intubación de emergencia</p>
+      </div>
+      <div class="info-box"><strong>Definición SRI:</strong> Administración casi simultánea de un agente inductor y un bloqueador neuromuscular para obtener condiciones óptimas de intubación en el menor tiempo posible, con mínimo riesgo de aspiración.</div>
+      <div class="card">
+        <ol class="step-list">
+          <li><strong>Preparación</strong> — Verificar equipo: laringoscopio funcional (hoja Mac 3–4 o Miller 2–3) · tubo 7.0–8.0 (H) / 6.5–7.5 (M) con estilete en "bastón de hockey" · jeringa 10 mL · capnógrafo · succión activa · BVM con O₂ · dos accesos IV/IO · medicamentos en jeringas etiquetadas.</li>
+          <li><strong>Preoxigenación</strong> — O₂ 100% × 3–5 min (mascarilla no reinhalante a 15 L/min). Meta SpO₂ &gt;95% antes de iniciar. En apnea o SpO₂ baja: cánula nasal de alto flujo 15 L/min (<em>apneic oxygenation</em>) durante toda la laringoscopia.</li>
+          <li><strong>Pretratamiento</strong> (opcional) — <strong>Lidocaína</strong> 1.5 mg/kg IV 3 min antes si TCE/HIC (atenúa la ↑PIC por la laringoscopia). <strong>Atropina</strong> 0.02 mg/kg en &lt;1 año (previene bradicardia vagal). <strong>Fentanilo</strong> 1–3 mcg/kg en HTA severa o isquemia coronaria activa.</li>
+          <li><strong>Parálisis e Inducción</strong> — Administrar el <strong>inductor primero</strong>, luego inmediatamente el bloqueador neuromuscular. La maniobra de Sellick (presión cricoidea) puede aplicarse durante la apnea hasta confirmar el tubo (controvertida). Ver tabla farmacológica.</li>
+          <li><strong>Posicionamiento</strong> — Posición de "olfateo": cabeza extendida sobre cuello flexionado (alinea eje oral-faríngeo-laríngeo). En obesos: posición rampa (orejas al nivel del esternón). Elevar la cama a nivel de la apófisis xifoides del operador. <strong>Maniobra BURP:</strong> Back-Up-Right Pressure sobre el cartílago tiroides para mejorar la visión laringoscópica.</li>
+          <li><strong>Pasaje del tubo</strong> — Laringoscopia directa (hoja Mac en vallécula) o videolaringoscopia. <strong>Visualizar cuerdas vocales antes de pasar el tubo.</strong> Introducir el tubo bajo visión directa. Inflar neumotaponador 5–10 mL. Anotar la distancia en la comisura labial (habitualmente 21–23 cm en adultos).</li>
+          <li><strong>Post-intubación</strong> — Confirmar: 1) EtCO₂ onda cuadrada continua (gold standard) + 2) Auscultación bilateral y epigastrio + 3) Condensación en el tubo + 4) Rx tórax. Fijar el tubo. Iniciar sedoanalgesia de mantenimiento. Programar ventilador: VT 6–8 mL/kg peso ideal, FR 12–16/min, PEEP 5, FiO₂ ajustar a SpO₂ 94–98%.</li>
+        </ol>
+      </div>
+      <div class="key-box"><strong>Regla de oro:</strong> Nunca pasar el tubo sin ver las cuerdas vocales. Si la vista no es óptima en 30 s → reoxigenar con BVM antes de un segundo intento.</div>
+    </div>
+
+    <div class="chapter" id="sri-c3">
+      <div class="guide-header">
+        <div class="guide-tag">Vía Aérea · Capítulo 03</div>
+        <h1 class="guide-h1">Farmacología de la SRI</h1>
+      </div>
+      <h2>Agentes inductores</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fármaco</th><th>Dosis SRI</th><th>Inicio / Duración</th><th>Mecanismo</th><th>Indicación preferente</th><th>Contraindicaciones</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Etomidato</strong><br><span class="badge b-green">Estabilidad HD</span></td><td>0.3 mg/kg IV</td><td>15–45 s / 5–10 min</td><td>Potencia GABA-A. Mínimo efecto cardiovascular</td><td><strong>Paciente inestable / shock.</strong> Trauma. Hipotensión de cualquier causa</td><td>Insuficiencia suprarrenal conocida (supresión cortisol 6–8h incluso con dosis única)</td></tr>
+            <tr><td><strong>Ketamina</strong><br><span class="badge b-blue">Broncodilatador</span></td><td>1–2 mg/kg IV<br>4–6 mg/kg IM</td><td>45–60 s / 10–20 min</td><td>Antagonista NMDA. Disociativo. Libera catecolaminas endógenas. Broncodilatación directa</td><td><strong>Broncoespasmo / asma.</strong> Hipovolemia. Pediatría. Estado asmático</td><td>Precaución en HTA severa descontrolada. HIC (relativo — evidencia moderna favorable)</td></tr>
+            <tr><td><strong>Propofol</strong><br><span class="badge b-red">↓PA</span></td><td>1.5–2.5 mg/kg IV<br>Anciano: 0.5–1 mg/kg</td><td>15–45 s / 5–10 min</td><td>Potencia GABA-A. ↓RVS y gasto cardíaco marcados</td><td>Paciente <strong>hemodinámicamente estable.</strong> Convulsiones activas. UCI electiva</td><td><strong>Contraindicado en hipotensión / shock.</strong> Alergia proteína huevo. Síndrome infusión propofol</td></tr>
+            <tr><td><strong>Midazolam</strong></td><td>0.2–0.3 mg/kg IV</td><td>60–90 s / 20–30 min</td><td>BDZ. Potencia GABA-A</td><td>Convulsiones activas. Recurso si otros no disponibles</td><td>Inicio lento (subóptimo para SRI). Hipotensión importante con opioides</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Bloqueadores neuromusculares</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fármaco</th><th>Tipo</th><th>Dosis SRI</th><th>Inicio / Duración</th><th>Reversión</th><th>CI absolutas</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Succinilcolina</strong><br><span class="badge b-amber">Vigilar K⁺</span></td><td>Despolarizante</td><td>1.5 mg/kg IV<br>4 mg/kg IM</td><td><strong>45–60 s / 6–10 min</strong></td><td>Pseudocolinesterasa plasmática. No hay antídoto.</td><td>Hiperpotasemia (quemados &gt;48h, denervación, rabdomiólisis, inmovilización prolongada) · Miopatías · Hipertermia maligna familiar · Pseudocolinesterasa atípica</td></tr>
+            <tr><td><strong>Rocuronio</strong><br><span class="badge b-green">1ª línea moderna</span></td><td>No despolarizante</td><td><strong>1.2 mg/kg IV</strong> (SRI)<br>0.6 mg/kg intubación electiva</td><td><strong>45–60 s / 30–60 min</strong></td><td><strong>Sugammadex 16 mg/kg IV</strong> para reversión inmediata (en VA difícil)</td><td>Hepatopatía severa (metabolismo hepático). Hipersensibilidad conocida al rocuronio</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Elección según estado clínico</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Escenario clínico</th><th>Inductor de elección</th><th>BNM de elección</th><th>Consideraciones especiales</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge b-red">Shock / hipotensión</span></td><td>Etomidato 0.3 mg/kg</td><td>Rocuronio 1.2 mg/kg</td><td>Ketamina como alternativa. Reducir dosis del inductor si PAS &lt;60</td></tr>
+            <tr><td><span class="badge b-amber">Broncoespasmo severo / asma</span></td><td>Ketamina 2 mg/kg</td><td>Rocuronio o Succinilcolina</td><td>La ketamina es el único inductor broncodilatador</td></tr>
+            <tr><td><span class="badge b-green">Hemodinámicamente estable</span></td><td>Propofol 2 mg/kg o Etomidato</td><td>Succinilcolina o Rocuronio</td><td>Propofol da mejores condiciones de intubación y mayor sedación</td></tr>
+            <tr><td><span class="badge b-purple">Hiperpotasemia / miopatía</span></td><td>Etomidato o Ketamina</td><td><strong>Rocuronio 1.2 mg/kg</strong> (Succinilcolina CI absoluta)</td><td>Succinilcolina puede causar liberación masiva de K⁺ → paro cardíaco</td></tr>
+            <tr><td><span class="badge b-blue">TCE severo / HIC</span></td><td>Etomidato 0.3 mg/kg</td><td>Rocuronio 1.2 mg/kg</td><td>Lidocaína pretratamiento. Evitar hipotensión. PAS &gt;90 mmHg</td></tr>
+            <tr><td><span class="badge b-teal">VA difícil anticipada</span></td><td>Etomidato o Ketamina</td><td>Rocuronio 1.2 mg/kg + Sugammadex listo</td><td>Considerar intubación vigil con fibroscopio. Tener cricotiroidotomía preparada</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chapter" id="sri-c4">
+      <div class="guide-header">
+        <div class="guide-tag">Vía Aérea · Capítulo 04</div>
+        <h1 class="guide-h1">Vía aérea difícil y rescate</h1>
+      </div>
+      <h2>Algoritmo de vía aérea difícil — Regla de 3</h2>
+      <div class="card">
+        <ol class="step-list">
+          <li><strong>Primer intento:</strong> Laringoscopia directa con hoja Mac 3/4 + posición óptima + BURP. Si visión Cormack-Lehane ≥3 → videolaringoscopia. <strong>Máximo 3 intentos en total por todo el equipo.</strong></li>
+          <li><strong>Videolaringoscopia</strong> (GlideScope, C-MAC, King Vision): indicada si Mallampati III/IV, apertura oral reducida, cuello corto, o fracaso de laringoscopia directa. Mejora la visión en la mayoría de VA difíciles.</li>
+          <li><strong>Dispositivo supraglótico (DSG) de rescate:</strong> si el tubo no puede colocarse — i-gel, LMA Fastrach o King LT. El DSG garantiza oxigenación mientras se planifica el siguiente paso.</li>
+          <li><strong>Intubación por el DSG:</strong> algunos DSG permiten pasar un broncoscopio o un tubo de intercambio para intubación dirigida.</li>
+          <li><strong>Cricotiroidotomía quirúrgica:</strong> única opción en escenario "no puedo intubar, no puedo oxigenar" (CICO). Técnica: incisión vertical en piel → incisión horizontal en membrana cricotiroidea → dilatar → insertar tubo 6.0 sin neumotaponador o cánula de traqueostomía.</li>
+        </ol>
+      </div>
+      <div class="warn-box"><strong>Escenario CICO — Cannot Intubate, Cannot Oxygenate:</strong> La demora en la cricotiroidotomía mata. Si SpO₂ cae de forma inexorable a pesar de BVM + DSG → cricotiroidotomía inmediata sin más intentos de laringoscopia.</div>
+      <h2>Capnografía — interpretación de la onda</h2>
+      <div class="two-col">
+        <div class="card">
+          <h4>Onda normal cuadrada (tubo traqueal)</h4>
+          <svg viewBox="0 0 260 80" style="width:100%;display:block;margin:8px 0">
+            <rect width="260" height="80" fill="#f0f7f0"/>
+            <line x1="0" y1="60" x2="260" y2="60" stroke="#b0ccb0" stroke-width="0.5"/>
+            <polyline points="10,60 10,60 25,60 25,25 80,25 80,60 90,60 105,60 105,25 160,25 160,60 170,60 185,60 185,25 240,25 240,60 250,60" fill="none" stroke="#1A6B3A" stroke-width="2" stroke-linejoin="round"/>
+            <text x="10" y="75" fill="#3A6A3A" font-size="8" font-family="monospace">EtCO₂ 38 mmHg — onda cuadrada = tubo traqueal</text>
+          </svg>
+        </div>
+        <div class="card">
+          <h4>Onda plana (tubo esofágico)</h4>
+          <svg viewBox="0 0 260 80" style="width:100%;display:block;margin:8px 0">
+            <rect width="260" height="80" fill="#fff5f5"/>
+            <line x1="0" y1="60" x2="260" y2="60" stroke="#f0c0c0" stroke-width="0.5"/>
+            <polyline points="10,60 25,58 40,62 60,59 80,61 100,60 120,59 140,61 160,60 180,58 200,62 220,60 240,59 260,60" fill="none" stroke="#C0392B" stroke-width="2" stroke-linejoin="round"/>
+            <text x="10" y="75" fill="#C0392B" font-size="8" font-family="monospace">EtCO₂ ~0 — onda plana = intubación esofágica</text>
+          </svg>
+        </div>
+      </div>
+      <div class="info-box"><strong>Valores EtCO₂ en RCP:</strong> &lt;10 mmHg → compresiones insuficientes. 10–25 mmHg → RCP en curso. Subida súbita &gt;40 mmHg → ROSC. Normal en ventilado: 35–45 mmHg.</div>
+    </div>
+  </div><!-- /g-sri -->
+
+  <!-- ███████████████████████████████████████████████
+       GUÍA 5: PROTOCOLO RUSH
+  ███████████████████████████████████████████████ -->
+  <div class="guide-page" id="g-rush">
+    <div class="chapter active" id="rush-c1">
+      <div class="guide-header">
+        <div class="guide-tag">RUSH · Capítulo 01</div>
+        <h1 class="guide-h1">Protocolo RUSH<br><em style="font-size:0.6em;color:var(--c-text2)">Rapid Ultrasound in Shock</em></h1>
+        <p class="guide-desc">Evaluación ecográfica sistemática del paciente en shock para identificar la causa y guiar el tratamiento en menos de 5 minutos</p>
+      </div>
+      <div class="info-box"><strong>El RUSH evalúa tres componentes:</strong> <strong>PUMP</strong> (la bomba — corazón) · <strong>TANK</strong> (el tanque — volemia) · <strong>PIPES</strong> (las tuberías — grandes vasos). Cada componente permite identificar el tipo de shock.</div>
+
+      <h2>PUMP — La bomba cardíaca</h2>
+      <div class="rush-grid">
+        <div class="rush-zone">
+          <div class="rush-zone-header">
+            <div class="rush-zone-num" style="background:var(--c-red-l);color:var(--c-red)">1</div>
+            Pericardio
+          </div>
+          <p>Ventana subcostal o paraesternal. Buscar fluido pericárdico (imagen anecogénica alrededor del corazón). Si hay colapso de AD o VD → taponamiento cardíaco.</p>
+        </div>
+        <div class="rush-zone">
+          <div class="rush-zone-header">
+            <div class="rush-zone-num" style="background:var(--c-accent-l);color:var(--c-accent)">2</div>
+            Función VI
+          </div>
+          <p>Ventana paraesternal eje largo. Evaluar la fracción de eyección visual: VI hiperdinámico (pequeño, hipercontráctil = hipovolemia/shock distributivo) vs. VI dilatado, hipoquinético (IC, miocardiopatía).</p>
+        </div>
+        <div class="rush-zone">
+          <div class="rush-zone-header">
+            <div class="rush-zone-num" style="background:var(--c-amber-l);color:var(--c-amber)">3</div>
+            VD y septum
+          </div>
+          <p>Apical 4 cámaras. VD dilatado (&gt;2/3 del VI) + septum desviado hacia el VI ("D-sign" en eje corto) = sobrecarga de presión aguda → TEP o neumotórax a tensión.</p>
+        </div>
+      </div>
+
+      <h2>Ventana paraesternal eje largo — anatomía ecográfica</h2>
+      <div class="anatomy-wrap">
+        <svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" font-family="'DM Mono',monospace" font-size="10">
+          <rect width="480" height="280" fill="#f0f7f0"/>
+          <defs>
+            <radialGradient id="heartGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FDECEA"/>
+              <stop offset="100%" stop-color="#F5C0BC"/>
+            </radialGradient>
+          </defs>
+          <!-- Cuerpo del corazón simplificado -->
+          <path d="M140,60 Q160,40 200,50 Q260,55 300,70 Q340,85 350,140 Q355,190 320,220 Q280,250 220,255 Q165,258 135,230 Q100,200 110,150 Q115,100 140,60 Z" fill="url(#heartGrad)" stroke="#C09090" stroke-width="1.5"/>
+
+          <!-- VI (ventrículo izquierdo) -->
+          <path d="M155,110 Q180,100 215,110 Q240,120 245,160 Q245,200 215,215 Q185,225 165,210 Q145,195 148,160 Q150,130 155,110 Z" fill="rgba(192,57,43,0.15)" stroke="#C04040" stroke-width="1.5"/>
+          <text x="180" y="165" fill="#C04040" font-size="9" text-anchor="middle">VI</text>
+
+          <!-- VD (ventrículo derecho) -->
+          <path d="M155,108 Q145,85 170,75 Q200,65 240,75 Q260,90 255,115 Q245,140 215,138 Q185,135 155,110 Z" fill="rgba(44,74,140,0.15)" stroke="#2C4A8C" stroke-width="1.5"/>
+          <text x="205" y="108" fill="#2C4A8C" font-size="9" text-anchor="middle">VD</text>
+
+          <!-- AI (aurícula izquierda) -->
+          <path d="M165,212 Q165,240 195,248 Q225,252 245,238 Q265,220 250,210 Q235,200 215,215 Z" fill="rgba(91,62,166,0.15)" stroke="#5B3EA6" stroke-width="1.5"/>
+          <text x="210" y="235" fill="#5B3EA6" font-size="9" text-anchor="middle">AI</text>
+
+          <!-- Aorta -->
+          <path d="M245,160 Q270,155 295,130 Q320,105 310,80 Q300,60 280,55" fill="none" stroke="#8B0000" stroke-width="3"/>
+          <text x="310" y="130" fill="#8B0000" font-size="9">Ao</text>
+
+          <!-- Pericardio -->
+          <path d="M138,58 Q155,38 200,48 Q265,53 305,68 Q350,83 360,142 Q365,195 325,225 Q282,258 218,262 Q158,265 128,232 Q90,198 100,148 Q105,98 138,58" fill="none" stroke="var(--c-amber)" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="370" y="100" fill="var(--c-amber)" font-size="9">Pericardio</text>
+          <line x1="367" y1="97" x2="340" y2="85" stroke="var(--c-amber)" stroke-width="0.5"/>
+
+          <!-- Válvula mitral -->
+          <line x1="215" y1="150" x2="215" y2="165" stroke="#1A6B3A" stroke-width="1.5"/>
+          <text x="255" y="158" fill="#1A6B3A" font-size="9">V. Mitral</text>
+          <line x1="253" y1="156" x2="220" y2="156" stroke="#1A6B3A" stroke-width="0.5"/>
+
+          <!-- Válvula aórtica -->
+          <circle cx="268" cy="153" r="5" fill="none" stroke="#8B4513" stroke-width="1.5"/>
+          <text x="300" y="150" fill="#8B4513" font-size="9">V. Aórtica</text>
+
+          <!-- Derrame pericárdico ejemplo -->
+          <path d="M110,155 Q108,160 112,165" stroke="#E74C3C" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+          <text x="55" y="165" fill="#E74C3C" font-size="8">Derrame</text>
+          <line x1="109" y1="163" x2="90" y2="163" stroke="#E74C3C" stroke-width="0.5"/>
+
+          <!-- Etiquetas ventanas -->
+          <rect x="380" y="20" width="90" height="220" rx="4" fill="var(--c-surface)" stroke="var(--c-border)"/>
+          <text x="390" y="36" fill="var(--c-text2)" font-size="8">HALLAZGOS</text>
+          <text x="390" y="52" fill="var(--c-green)" font-size="8">■ VI pequeño</text>
+          <text x="390" y="62" fill="var(--c-green)" font-size="8">  hiperdinámico</text>
+          <text x="390" y="72" fill="var(--c-text3)" font-size="7">  → hipovolemia</text>
+          <line x1="387" y1="78" x2="460" y2="78" stroke="var(--c-border)" stroke-width="0.5"/>
+          <text x="390" y="92" fill="var(--c-accent)" font-size="8">■ VI dilatado</text>
+          <text x="390" y="102" fill="var(--c-accent)" font-size="8">  hipoquinético</text>
+          <text x="390" y="112" fill="var(--c-text3)" font-size="7">  → IC / miocarditis</text>
+          <line x1="387" y1="118" x2="460" y2="118" stroke="var(--c-border)" stroke-width="0.5"/>
+          <text x="390" y="132" fill="var(--c-amber)" font-size="8">■ VD dilatado</text>
+          <text x="390" y="142" fill="var(--c-amber)" font-size="8">  +D-sign</text>
+          <text x="390" y="152" fill="var(--c-text3)" font-size="7">  → TEP masivo</text>
+          <line x1="387" y1="158" x2="460" y2="158" stroke="var(--c-border)" stroke-width="0.5"/>
+          <text x="390" y="172" fill="var(--c-red)" font-size="8">■ Fluido</text>
+          <text x="390" y="182" fill="var(--c-red)" font-size="8">  pericárdico</text>
+          <text x="390" y="192" fill="var(--c-text3)" font-size="7">  → Taponamiento</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="chapter" id="rush-c2">
+      <div class="guide-header">
+        <div class="guide-tag">RUSH · Capítulo 02</div>
+        <h1 class="guide-h1">TANK y PIPES</h1>
+      </div>
+      <h2>TANK — Estado de volemia</h2>
+      <div class="rush-grid">
+        <div class="rush-zone">
+          <div class="rush-zone-header">
+            <div class="rush-zone-num" style="background:var(--c-teal-l);color:var(--c-teal)">A</div>
+            VCI (vena cava inferior)
+          </div>
+          <p>Ventana subcostal. VCI colapsada (&lt;2.1 cm) o con colapso inspiratorio &gt;50% → tanque <strong>vacío</strong> (hipovolemia, vasodilatación). VCI dilatada sin colapso → tanque <strong>lleno</strong> (IC congestiva, taponamiento, TEP).</p>
+        </div>
+        <div class="rush-zone">
+          <div class="rush-zone-header">
+            <div class="rush-zone-num" style="background:var(--c-teal-l);color:var(--c-teal)">B</div>
+            Protocolo BLUE (pulmones)
+          </div>
+          <p>Evaluar cada hemitórax. Líneas B (deslizamiento pleural + artefactos verticales) → edema pulmonar. Ausencia de deslizamiento pleural → neumotórax. Consolidación → neumonía/atelectasia.</p>
+        </div>
+        <div class="rush-zone">
+          <div class="rush-zone-header">
+            <div class="rush-zone-num" style="background:var(--c-teal-l);color:var(--c-teal)">C</div>
+            FAST (peritoneo)
+          </div>
+          <p>Hemoperitoneo libre → hipovolemia por sangrado interno. Morrison, esplenorrenal, Douglas. Combinar con hallazgos cardíacos para diferenciar shock hemorrágico vs distributivo.</p>
+        </div>
+      </div>
+
+      <h2>PIPES — Los grandes vasos</h2>
+      <div class="two-col">
+        <div class="card">
+          <h4>Aorta abdominal</h4>
+          <p><strong>Técnica:</strong> transversal desde xifoides hasta bifurcación ilíaca. Un diámetro &gt;3 cm = aneurisma. &gt;5 cm + dolor abdominal + hipotensión = sospecha de ruptura de AAA.</p>
+          <p><strong>Hallazgo crítico:</strong> AAA roto → cirugía de emergencia. No perder tiempo en estudios.</p>
+        </div>
+        <div class="card">
+          <h4>Trombosis venosa profunda (TVP)</h4>
+          <p>En shock + sospecha de TEP: buscar TVP en venas femorales y poplíteas. Técnica de compresión: vena normal se colapsa con presión mínima. Vena trombosada no se comprime.</p>
+          <p>TVP + VD dilatado + hipoxemia = alta probabilidad de TEP masivo.</p>
+        </div>
+      </div>
+
+      <h2>Tabla resumen — RUSH y tipo de shock</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo de shock</th><th>PUMP (corazón)</th><th>TANK (volemia)</th><th>PIPES (vasos)</th><th>Tratamiento inicial</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Hemorrágico</strong></td><td>VI hiperdinámico</td><td>VCI colapsada · FAST positivo</td><td>Posible AAA</td><td>Hemoderivados + cirugía / embolización</td></tr>
+            <tr><td><strong>Distributivo (séptico)</strong></td><td>VI hiperdinámico</td><td>VCI colapsada</td><td>Normal</td><td>Fluidos 30 mL/kg + antibióticos + noradrenalina</td></tr>
+            <tr><td><strong>Cardiogénico</strong></td><td>VI dilatado, hipoquinético</td><td>VCI dilatada · Líneas B</td><td>Normal</td><td>Vasopresores + inotrópicos. Descartar IAM</td></tr>
+            <tr><td><strong>Obstructivo (TEP)</strong></td><td>VD dilatado · D-sign · VI pequeño</td><td>VCI dilatada</td><td>TVP en MMII</td><td>Trombolisis (alteplasa 100 mg) o embolectomía</td></tr>
+            <tr><td><strong>Obstructivo (taponamiento)</strong></td><td>Derrame pericárdico · Colapso AD/VD</td><td>VCI dilatada</td><td>Normal</td><td>Pericardiocentesis de urgencia</td></tr>
+            <tr><td><strong>Obstructivo (neumotórax tensión)</strong></td><td>VD dilatado leve · VI pequeño</td><td>VCI dilatada</td><td>Ausencia deslizamiento pleural</td><td>Descompresión aguja inmediata (no esperar ECO)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chapter" id="rush-c3">
+      <div class="guide-header">
+        <div class="guide-tag">RUSH · Capítulo 03</div>
+        <h1 class="guide-h1">POCUS en paro cardiorrespiratorio</h1>
+      </div>
+      <h2>Ecografía durante el paro — qué buscar</h2>
+      <div class="card-grid">
+        <div class="card"><h4 style="color:var(--c-red)">Actividad cardíaca</h4><p>¿Hay movimiento cardíaco? Ventana subcostal. <strong>Asistolia ecográfica</strong> (ausencia de movimiento cardíaco) en contexto clínico de paro = predictor de no ROSC con alta especificidad. Influye en decisiones de resucitación.</p></div>
+        <div class="card"><h4 style="color:var(--c-amber)">Causas tratables</h4><p>Derrame pericárdico masivo → taponamiento. VD dilatado → TEP. Neumotórax (ausencia de deslizamiento pleural unilateral). FAST positivo → hipovolemia.</p></div>
+        <div class="card"><h4 style="color:var(--c-accent)">Técnica durante RCP</h4><p>Evaluar el corazón en la pausa de análisis de ritmo (≤10 s). Preparar al ecografista antes de la pausa. Ventana subcostal es la más práctica durante RCP activa.</p></div>
+        <div class="card"><h4 style="color:var(--c-green)">ROSC por ECO</h4><p>Aparición súbita de movimiento cardíaco organizado durante o tras RCP puede preceder a la detección clínica de pulso. Coordinar con el equipo para verificar pulso si se detecta actividad cardíaca.</p></div>
+      </div>
+
+      <h2>Protocolo de inserción ECO en el código</h2>
+      <ol class="step-list">
+        <li>Designar un ecografista <strong>que no interrumpa la RCP</strong> — rol exclusivo de POCUS durante el código.</li>
+        <li>Preparar la sonda y el equipo durante los 2 min de RCP activa.</li>
+        <li>En la pausa de análisis de ritmo: colocar sonda subcostal en &lt;5 s → capturar imagen → reanudar RCP sin esperar resultado si el ritmo indica hacerlo.</li>
+        <li>Comunicar hallazgos al líder en tiempo real: "Hay derrame pericárdico — probable taponamiento."</li>
+        <li>Repetir en cada pausa para monitorear cambios y evaluar ROSC.</li>
+      </ol>
+    </div>
+
+    <div class="chapter" id="rush-c4">
+      <div class="guide-header">
+        <div class="guide-tag">RUSH · Capítulo 04</div>
+        <h1 class="guide-h1">Casos y hallazgos RUSH</h1>
+      </div>
+      <div class="scenario">
+        <div class="scenario-tag">Caso RUSH 01</div>
+        <div class="scenario-title">Masculino 72a · Hipotensión súbita + dolor abdominal desgarrante</div>
+        <p><strong>RUSH:</strong> PUMP → VI hiperdinámico. TANK → VCI colapsada. PIPES → aorta abdominal 7.2 cm con fluido periaórtico.</p>
+        <p><strong>Diagnóstico:</strong> Aneurisma de aorta abdominal roto. <strong>Conducta:</strong> Activar cirugía vascular de emergencia. No realizar TC. 2 accesos IV gruesos + hipotensión permisiva (PAS 70–80) hasta cirugía. Transfusión 1:1:1.</p>
+      </div>
+      <div class="scenario">
+        <div class="scenario-tag">Caso RUSH 02</div>
+        <div class="scenario-title">Femenino 45a · Post-operatorio cardíaco · Hipotensión + ingurgitación yugular</div>
+        <p><strong>RUSH:</strong> PUMP → derrame pericárdico circunferencial + colapso de AD en diástole. TANK → VCI dilatada. PIPES → normal.</p>
+        <p><strong>Diagnóstico:</strong> Taponamiento cardíaco post-quirúrgico. <strong>Conducta:</strong> Pericardiocentesis ecoguiada urgente. Cirugía torácica de emergencia si deterioro.</p>
+      </div>
+      <div class="scenario">
+        <div class="scenario-tag">Caso RUSH 03</div>
+        <div class="scenario-title">Masculino 55a · Shock + hipoxemia severa · Post-vuelo transoceánico</div>
+        <p><strong>RUSH:</strong> PUMP → VD masivamente dilatado, D-sign en eje corto, VI comprimido. TANK → VCI dilatada sin colapso. PIPES → TVP en vena femoral derecha.</p>
+        <p><strong>Diagnóstico:</strong> TEP masivo con cor pulmonale agudo. <strong>Conducta:</strong> Trombolisis sistémica (Alteplasa 100 mg IV en 2h). Si paro → 50 mg en bolo + RCP continua 60–90 min post-trombolisis. ECMO como puente si disponible.</p>
+      </div>
+    </div>
+  </div><!-- /g-rush -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+const guideNames = {acls:'ACLS · REANIMACIÓN',atls:'ATLS · TRAUMA',tox:'TOXIDROMES',sri:'VÍA AÉREA · SRI',rush:'RUSH · ECOGRAFÍA'};
+const chapTitles = {
+  'acls-c1':'Fisiología cardiovascular y ECG','acls-c2':'Farmacología de la reanimación','acls-c3':'Equipo y dinámica de reanimación','acls-c4':'Ritmos de paro y arritmias','acls-c5':'Trazados ECG ilustrados','acls-c6':'Integración clínica — Casos',
+  'atls-c1':'Primary Survey — ABCDE','atls-c2':'Secondary Survey','atls-c3':'Shock en el trauma','atls-c4':'Trauma torácico','atls-c5':'TCE y lesión de columna','atls-c6':'Trauma abdominal',
+  'tox-c1':'Reconocimiento del toxidrome','tox-c2':'Toxidrome simpaticomimético','tox-c3':'Colinérgico y anticolinérgico','tox-c4':'Opiáceos y sedantes','tox-c5':'Antídotos clave',
+  'sri-c1':'Anatomía de la vía aérea','sri-c2':'Los 7 pasos de la SRI','sri-c3':'Farmacología de la SRI','sri-c4':'Vía aérea difícil y rescate',
+  'rush-c1':'RUSH — Pump (corazón)','rush-c2':'Tank y Pipes','rush-c3':'POCUS en paro cardiorrespiratorio','rush-c4':'Casos y hallazgos RUSH'
+};
+
+let currentGuide = 'acls';
+let currentChapter = 'c1';
+
+function loadGuide(g) {
+  // hide all guides
+  document.querySelectorAll('.guide-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('g-' + g).classList.add('active');
+  // nav buttons
+  document.querySelectorAll('.guide-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.chapter-nav').forEach(n => n.style.display = 'none');
+  event.currentTarget.classList.add('active');
+  document.getElementById('chap-' + g).style.display = 'block';
+  currentGuide = g;
+  currentChapter = 'c1';
+  loadChapter(g, 'c1');
+  // topbar
+  document.getElementById('tbar-guide').textContent = guideNames[g];
+  document.getElementById('tbar-title').textContent = chapTitles[g + '-c1'];
+  if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+}
+
+function loadChapter(g, c) {
+  document.querySelectorAll('#g-' + g + ' .chapter').forEach(ch => ch.classList.remove('active'));
+  const el = document.getElementById(g + '-' + c);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('#chap-' + g + ' .chapter-btn').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll('#chap-' + g + ' .chapter-btn');
+  const idx = parseInt(c.replace('c','')) - 1;
+  if(btns[idx]) btns[idx].classList.add('active');
+  currentChapter = c;
+  document.getElementById('tbar-title').textContent = chapTitles[g + '-' + c] || '';
+  document.getElementById('tbar-guide').textContent = guideNames[g];
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Close sidebar on outside click (mobile)
+document.addEventListener('click', function(e) {
+  if(window.innerWidth <= 768) {
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.querySelector('.hamburger');
+    if(!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+</script>
+</body>
+</html>
